@@ -29,6 +29,7 @@ This document outlines the plan to implement a Unix Socket server for a key-valu
 **5. Command Implementation (within `src/`):**
 
 *   Implement the logic for each command specified in the `README.md`, separated into logical modules:
+
     *   **Connection & Server Commands:** `quit`, `shutdown`, `version`, `ping`, `status`, `help`.
     *   **Data Store Commands:** `set`, `get`, `remove`, `last`, `dbsize`, `keys`, `cleardb`, `save`.
     *   **Key Generation Commands:** `txkey`, `rtkey`.
@@ -38,7 +39,18 @@ This document outlines the plan to implement a Unix Socket server for a key-valu
 *   Write Jest tests for each command to ensure they behave as expected.
 *   Mock the `keyv` dependency to isolate the command logic during testing.
 *   Write tests for the server's connection handling and data parsing.
+*   Test Coverage
 
 **7. Configuration (`src/config.ts`):**
 
 *   Implement a simple configuration module to manage settings like the socket file path and the path to the data file, using an encrypted `.env` file with `dotenvx`.
+
+**8. Logging
+
+* Use Winston for logging
+* create a rolling file logger
+
+**9. Integration (e2e) Testing
+
+* create e2e folder
+* develop tests with jest
