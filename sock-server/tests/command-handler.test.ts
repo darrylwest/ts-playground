@@ -9,6 +9,7 @@ jest.mock('../src/store', () => ({
     delete: jest.fn(),
     clear: jest.fn(),
     iterator: jest.fn(),
+    ping: jest.fn(),
   },
 }));
 
@@ -26,6 +27,15 @@ describe('Command Handler', () => {
     const response = await handleCommand(Buffer.from('version'));
     // Assuming version is 1.0.0 from package.json
     expect(response.response).toMatch(/^v\d+\.\d+\.\d+$/);
+  });
+
+  describe('pingdb command', () => {
+    it('should return PONG from the database', async () => {
+      (store.ping as jest.Mock).mockResolvedValue('PONG');
+      const response = await handleCommand(Buffer.from('pingdb'));
+      expect(store.ping).toHaveBeenCalled();
+      expect(response.response).toBe('PONG');
+    });
   });
 
   describe('set command', () => {

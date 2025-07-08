@@ -25,8 +25,8 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
       }
       const [key, ...valueParts] = args;
       const value = valueParts.join(' ');
-      // TODO store.set(key, value);
-      return { response: 'OK' };
+      const ok = await store.set(key, value);
+      return { response: ok ? 'OK' : 'fail' };
     }
 
     case 'get': {
@@ -34,8 +34,7 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
         return { response: 'ERROR: "get" command requires a key.' };
       }
       const [key] = args;
-      // TODO store.get(key);
-      const value = "bad";
+      const value = await store.get(key);
       return { response: value === undefined ? '(nil)' : value };
     }
 
