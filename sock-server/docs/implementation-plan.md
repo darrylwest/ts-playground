@@ -54,3 +54,39 @@ This document outlines the plan to implement a Unix Socket server for a key-valu
 
 * create e2e folder
 * develop tests with jest
+
+---- Revised to replace keyv with valkey
+
+✦ Okay, I understand. Replacing keyv with valkey is a significant change, as it involves switching the underlying data store.
+
+
+  Here's a plan to migrate the socket server to use Valkey:
+
+  1. Research Valkey & Client:
+   * Briefly understand Valkey's core concepts and identify a suitable Node.js client library (e.g., ioredis or node-redis).
+
+
+  2. Update Dependencies:
+   * Uninstall keyv and keyv-file.
+   * Install the chosen Valkey client library.
+
+
+  3. Refactor `src/store.ts`:
+   * Replace the Keyv initialization with the Valkey client initialization.
+   * Adapt set, get, delete, and clear operations to use the Valkey client's API.
+   * Implement the iterator functionality using Valkey's SCAN command to support dbsize, keys, last, and status commands.
+
+
+  4. Refactor `src/command-handler.ts`:
+   * Re-enable and update the dbsize, keys, last, and status commands to use the new Valkey-based iteration logic from src/store.ts.
+   * Ensure all other commands (set, get, remove, etc.) continue to interact correctly with the refactored store.ts.
+
+
+  5. Update `src/config.ts`:
+   * Modify configuration to include Valkey connection details (e.g., host, port) instead of dataPath if Valkey is running as a separate service. If Valkey is embedded or file-based, adapt dataPath accordingly. (Initial assumption: Valkey will run as a separate service, so new config for host/port
+     will be needed).
+
+
+  6. Update Tests (`tests/command-handler.test.ts`):
+   * Modify the jest.mock setup to mock the Valkey client instead of keyv.
+   * Verify that all existing tests still pass with the new data store.
