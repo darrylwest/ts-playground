@@ -1,5 +1,5 @@
 import { version } from '../package.json';
-import keyv from './store';
+import { keyv } from './store';
 import { config } from './config';
 
 export interface CommandResponse {
