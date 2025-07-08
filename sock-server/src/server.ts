@@ -1,14 +1,14 @@
 import net from 'net';
 import fs from 'fs';
 import { config } from './config';
+import { handleCommand } from './command-handler';
 
 const server = net.createServer(socket => {
   console.log('Client connected.');
 
-  socket.on('data', data => {
-    const message = data.toString().trim();
-    console.log('Received:', message);
-    socket.write(`ECHO: ${message}\n`);
+  socket.on('data', async data => {
+    const response = await handleCommand(data);
+    socket.write(`${response}\n`);
   });
 
   socket.on('close', () => {
