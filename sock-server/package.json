@@ -1,7 +1,7 @@
 {
   "name": "sock-server",
   "version": "1.0.0",
-  "description": "A TypeScript socket server that uses keyv as a data store.",
+  "description": "A TypeScript socket server that uses valkey as a data store.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -34,8 +34,7 @@
   "type": "commonjs",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.46.0",
-    "keyv": "^5.3.4",
-    "keyv-file": "^5.1.3"
+    "iovalkey": "^0.3.3"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

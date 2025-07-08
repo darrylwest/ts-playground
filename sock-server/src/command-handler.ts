@@ -1,5 +1,5 @@
 import { version } from '../package.json';
-import { keyv } from './store';
+import { store } from './store';
 import { config } from './config';
 
 export interface CommandResponse {
@@ -25,7 +25,7 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
       }
       const [key, ...valueParts] = args;
       const value = valueParts.join(' ');
-      await keyv.set(key, value);
+      // TODO store.set(key, value);
       return { response: 'OK' };
     }
 
@@ -34,7 +34,8 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
         return { response: 'ERROR: "get" command requires a key.' };
       }
       const [key] = args;
-      const value = await keyv.get(key);
+      // TODO store.get(key);
+      const value = "bad";
       return { response: value === undefined ? '(nil)' : value };
     }
 
@@ -43,33 +44,25 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
         return { response: 'ERROR: "remove" command requires a key.' };
       }
       const [key] = args;
-      const wasDeleted = await keyv.delete(key);
+      const wasDeleted = false; // await store.delete(key);
       return { response: wasDeleted ? '1' : '0' };
     }
 
     case 'dbsize': {
-      // keyv.iterator() seems to be undefined for keyv-file.
+      // TODO store.size();
       return { response: 'DB Size: Unknown (iterator not supported)' };
     }
 
     case 'keys': {
-      // keyv.iterator() seems to be undefined for keyv-file.
+      // TODO store.keys('*')
       return { response: 'Keys: Unknown (iterator not supported)' };
     }
 
-    case 'cleardb': {
-      await keyv.clear();
-      return { response: 'OK' };
-    }
-
     case 'save': {
-      // keyv-file automatically saves on set/delete.
-      // This command is a no-op for keyv-file.
       return { response: 'OK' };
     }
 
     case 'last': {
-      // keyv.iterator() seems to be undefined for keyv-file.
       return { response: 'Last: Unknown (iterator not supported)' };
     }
 
@@ -89,14 +82,18 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
       return { response: 'Shutting down server...', shutdownServer: true };
 
     case 'status': {
-      // keyv.iterator() seems to be undefined for keyv-file.
+      let dbSize = 0;
+      for await (const [key, value] of store.iterator()) {
+        dbSize++;
+      }
       const uptime = process.uptime(); // in seconds
-      const dataPath = config.dataPath;
-      return { response: `DB Size: Unknown (iterator not supported), Uptime: ${uptime.toFixed(2)}s, Data File: ${dataPath}` };
+      const valkeyHost = config.valkeyHost;
+      const valkeyPort = config.valkeyPort;
+      return { response: `DB Size: ${dbSize}, Uptime: ${uptime.toFixed(2)}s, Valkey Host: ${valkeyHost}, Valkey Port: ${valkeyPort}` };
     }
 
     case 'help':
-      return { response: `Available commands:\nquit - Close connection\nshutdown - Shut down server\nversion - Get server version\nping - Check server aliveness\nstatus - Get server status\nhelp - Display this help\nset <key> <value> - Set key/value\nget <key> - Get value by key\nremove <key> - Remove key/value\nlast <count> - Get last N key/value pairs\ndbsize - Get database size\nkeys - Get all keys\ncleardb - Clear database\nsave - Save database (automatic for file store)\ntxkey - Generate timestamp key\nrtkey - Generate route key` };
+      return { response: `Available commands:\nquit - Close connection\nshutdown - Shut down server\nversion - Get server version\nping - Check server aliveness\nstatus - Get server status\nhelp - Display this help\nset <key> <value> - Set key/value\nget <key> - Get value by key\nremove <key> - Remove key/value\nlast <count> - Get last N key/value pairs\ndbsize - Get database size\nkeys - Get all keys\nsave - Save database (automatic for Valkey)\ntxkey - Generate timestamp key\nrtkey - Generate route key` };
 
     default:
       return { response: `Unknown command: ${command}` };
