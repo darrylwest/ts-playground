@@ -29,6 +29,12 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Express app via a Unix socket!');
 });
 
+app.get('/api/get/:key', (req: Request, res: Response) => {
+    const key: string = req.params.key;
+    console.log(key);
+    res.send("here is the key: " + key);
+});
+
 // Instead of app.listen(3000), we listen on the file path.
 // The 'server' constant is typed as http.Server for better type-checking.
 const server: Server = app.listen(socketPath, () => {
