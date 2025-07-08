@@ -1,0 +1,14 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es2020",          // Modern Node.js versions support this
+    "module": "commonjs",         // The output format for Node.js
+    "outDir": "./dist",           // Where to put the compiled JavaScript
+    "rootDir": "./src",           // Where your TS source files are
+    "strict": true,               // Enable all strict type-checking options
+    "esModuleInterop": true,      // Helps with CJS/ESM module interoperability
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"] // Tells TypeScript to only compile files in the 'src' folder
+}
