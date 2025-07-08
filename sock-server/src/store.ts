@@ -25,12 +25,10 @@ export const store = {
 
   async get(key: string): Promise<string | undefined> {
     const value = await valkey.get(key);
-    // The 'get' command returns null if the key doesn't exist.
     return value === null ? undefined : value;
   },
 
   async delete(key: string): Promise<boolean> {
-    // CHANGE 4: The 'del' command in iovalkey takes keys as separate arguments, not an array.
     const result = await valkey.del(key);
     // It returns the number of keys deleted.
     return result > 0;
@@ -42,18 +40,24 @@ export const store = {
 
   // The original iterator implementation works perfectly with iovalkey.
   async *iterator(): AsyncGenerator<[string, string]> {
-    let cursor = 0; // iovalkey prefers a number for the cursor
-    do {
-      // The 'scan' command returns the next cursor and an array of keys.
-      const [nextCursor, keys] = await valkey.scan(cursor);
+    // Use a stream to fetch keys in batches automatically.
+    const stream = valkey.scanStream({
+      // Optional: match a pattern or change the batch size.
+      count: 100 
+    });
 
-      for (const key of keys) {
-        const value = await valkey.get(key);
-        if (value !== null) {
-          yield [key, value];
+    for await (const keys of stream) {
+      // 'keys' is an array of keys from a single SCAN batch.
+      if ((keys as string[]).length > 0) {
+        // Fetch all values for the batch of keys in a single command.
+        const values = await valkey.mget(keys as string[]);
+        for (let i = 0; i < (keys as string[]).length; i++) {
+          // mget returns null for non-existent keys.
+          if (values[i] !== null) {
+            yield [(keys as string[])[i], values[i] as string];
+          }
         }
       }
-      cursor = parseInt(nextCursor, 10);
-    } while (cursor !== 0);
-  },
+    }
+  }
 };
