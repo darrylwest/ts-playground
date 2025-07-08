@@ -2,6 +2,10 @@
 
 A TypeScript socket server that uses keyv as a data store.
 
+_Ok this is not worth the effort.  Much better just to use the Valkey lib directly._
+
+_Also, don't use keyv or glide._
+
 ## Server API
 
 The server exposes a TCP-based API on the port specified in the configuration file. The server handles the following commands:
