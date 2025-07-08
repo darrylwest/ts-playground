@@ -7,8 +7,16 @@ const server = net.createServer(socket => {
   console.log('Client connected.');
 
   socket.on('data', async data => {
-    const response = await handleCommand(data);
+    const { response, closeConnection, shutdownServer } = await handleCommand(data);
     socket.write(`${response}\n`);
+
+    if (closeConnection) {
+      socket.end();
+    }
+
+    if (shutdownServer) {
+      cleanup();
+    }
   });
 
   socket.on('close', () => {
