@@ -7,11 +7,26 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "npx ts-node src/server.ts",
     "test": "jest"
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/server.ts",
+      "!src/config.ts",
+      "!src/store.ts"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ]
   },
   "keywords": [],
   "author": "",
