@@ -1,6 +1,6 @@
 {
   "name": "ts-txkey",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TypeScript wrapper for txkey binary that generates unique short keys for k/v stores",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

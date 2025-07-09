@@ -4,7 +4,7 @@ import { createTxKey } from './index';
 (async () => {
     try {
         // Example 1: Invoking 'txkey' with a specific argument
-        const key1 = await createTxKey([]);
+        const key1 = await createTxKey();
         console.log('Generated Key 1:', key1); // Expected: 81WPUUnaM3Fn (or whatever txkey outputs for this input)
 
         // Example 2: If txkey generates a key without arguments (or with different ones)

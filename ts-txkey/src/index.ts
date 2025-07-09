@@ -15,13 +15,11 @@ const TXKEY_EXECUTABLE_PATH = '/usr/local/bin/txkey'; // or look up from config
  * The 'txkey' executable is expected to take arguments and print the
  * generated key to standard output (stdout).
  *
- * @param args An array of strings representing the arguments to pass to 'txkey'.
- * For example, if './txkey 81WPUUnaM3Fn' is your command,
- * you'd pass ['81WPUUnaM3Fn'].
+ * @param args An optional array of strings representing the arguments to pass to 'txkey'.
  * @returns A Promise that resolves with the generated key string from stdout.
  * @throws An error if the executable fails or returns no output.
  */
-export async function createTxKey(args: string[]): Promise<string> {
+export async function createTxKey(args: string[] = []): Promise<string> {
     // Construct the command string.
     // Ensure arguments are properly quoted if they might contain spaces or special characters.
     // For a simple string like '81WPUUnaM3Fn', quoting might not be strictly necessary,
