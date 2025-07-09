@@ -1,6 +1,6 @@
 {
   "name": "ts-txkey",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript wrapper for txkey binary that generates unique short keys for k/v stores",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:cov": "jest --coverage",
     "example": "ts-node src/example.ts",
     "dev": "ts-node src/index.ts"
   },
