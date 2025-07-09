@@ -11,13 +11,42 @@ The Models Service is a node.js / express / valkey service to define and impleme
 * express 
 * dotenvx for encrypted configuration
 * nodemod for dev server
-* valkey
-* txkey defined as `Date.now().toString(36) + Math.random().toString(36).substring(2, 10);`
+* valkey data store
 * winston for rolling file logger
+* date-fns for date/time calculations
+* dinero for money/currency calculations
 * jest for unit with mocks 
 * jest for e2e tests without mocks (live database, and full REST calls with node-fetch)
 * jest for code coverage reports
 * github workflow CI/CD script
+
+## Models
+
+### Domain Key
+
+* tkey : a base62 date based key unique to a specific domain
+	* used for unique id in domain models
+	* uses crypto to generate random numbers
+	* uses process.hrtime.bigint() for high res nano second clock
+	* always 16 characters
+    * sortable, new keys always increase (dt + random)
+
+### Base Model
+
+* key: txkey
+* dateCreated: number
+* lastUpdate: number
+* version: number
+
+### Contact Model
+
+### Address Model
+
+### User Model
+
+### Availability Model
+
+### Appointment Model
 
 ## TypeScript Files
 
