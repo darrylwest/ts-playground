@@ -1,7 +1,7 @@
 # Typescript TxKey
 
 
-This typescript code invokes a binary runnable `txkey` that generates a unique short key (12 chars).  
+This typescript code invokes a binary runnable `txkey` that  a unique short key (12 chars).  
 Keys are used in k/v store (Valkey, Redis) to uniquely identify records in a specific domain.
 The code below ensures that all keys are consistently generated either from c++ or node/typescript.
 
@@ -38,7 +38,7 @@ const TXKEY_EXECUTABLE_PATH = '/usr/local/bin/txkey'; // or look up from config
  * @returns A Promise that resolves with the generated key string from stdout.
  * @throws An error if the executable fails or returns no output.
  */
-async function generateKeyExternal(args: string[]): Promise<string> {
+async function createTxKey(args: string[]): Promise<string> {
     // Construct the command string.
     // Ensure arguments are properly quoted if they might contain spaces or special characters.
     // For a simple string like '81WPUUnaM3Fn', quoting might not be strictly necessary,
@@ -88,18 +88,18 @@ async function generateKeyExternal(args: string[]): Promise<string> {
 // Example 1: Invoking 'txkey' with a specific argument
 (async () => {
     try {
-        const generatedKey1 = await generateKeyExternal(['81WPUUnaM3Fn']);
-        console.log('Generated Key 1:', generatedKey1); // Expected: 81WPUUnaM3Fn (or whatever txkey outputs for this input)
+        const key1 = await createTxKey(['81WPUUnaM3Fn']);
+        console.log('Generated Key 1:', key1); // Expected: 81WPUUnaM3Fn (or whatever txkey outputs for this input)
 
         // Example 2: If txkey generates a key without arguments (or with different ones)
         // Adjust the arguments array based on how your txkey actually works.
         // If it generates a key on its own without arguments:
-        const generatedKey2 = await generateKeyExternal([]);
-        console.log('Generated Key 2 (no args):', generatedKey2); // Expecting something like 'someRandomKeyFromTxkey'
+        const key2 = await createTxKey([]);
+        console.log('Generated Key 2 (no args):', key2); // Expecting something like 'someRandomKeyFromTxkey'
 
         // Example 3: Error handling - if the executable path is wrong or it fails
         // To test this, you could temporarily set TXKEY_EXECUTABLE_PATH to './non_existent_txkey'
-        // const failedKey = await generateKeyExternal([]);
+        // const failedKey = await createTxKey([]);
         // console.log(failedKey);
 
     } catch (err) {
