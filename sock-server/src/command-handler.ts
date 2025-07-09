@@ -66,7 +66,8 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
     }
 
     case 'txkey': {
-      return { response: `tx-${Date.now()}` };
+      const key = Date.now().toString(36) + Math.random().toString(36).substring(2, 10)
+      return { response: key };
     }
 
     case 'rtkey': {
