@@ -8,6 +8,8 @@
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "example": "ts-node src/example.ts",
     "dev": "ts-node src/index.ts"
   },
   "keywords": ["txkey", "key-generation", "redis", "valkey"],

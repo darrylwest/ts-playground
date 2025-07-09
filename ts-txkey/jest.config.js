@@ -6,7 +6,16 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
+    '!src/example.ts', // Exclude example file from coverage
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
+  coverageThreshold: {
+    global: {
+      branches: 0,
+      functions: 100,
+      lines: 50,
+      statements: 50
+    }
+  }
 };

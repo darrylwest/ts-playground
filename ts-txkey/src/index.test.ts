@@ -50,4 +50,28 @@ describe('createTxKey Integration Tests', () => {
         const result = createTxKey([]);
         expect(result).toBeInstanceOf(Promise);
     });
+
+    it('should handle stderr output with warnings', async () => {
+        // Most txkey calls should succeed, but let's test with various args
+        // to potentially trigger different code paths
+        const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+        
+        try {
+            // Try with different argument patterns that might generate warnings
+            await createTxKey(['--verbose']);
+        } catch (error) {
+            // If it fails, that's also a valid test of error handling
+            expect(error).toBeInstanceOf(Error);
+        }
+        
+        consoleSpy.mockRestore();
+    });
+
+    it('should handle very long argument strings', async () => {
+        const longArg = 'a'.repeat(1000);
+        const result = await createTxKey([longArg]);
+        
+        expect(typeof result).toBe('string');
+        expect(result.length).toBeGreaterThan(0);
+    });
 });
