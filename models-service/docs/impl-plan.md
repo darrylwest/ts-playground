@@ -22,14 +22,17 @@ The Models Service is a node.js / express / valkey service to define and impleme
 
 ## Models
 
-### Domain Key
+### Domain Key: TxKey
 
-* DomainKey class: a base62 date based key unique to a specific domain
-	* used for unique id in domain models
-	* uses crypto to generate random numbers
-	* uses process.hrtime.bigint() for high res nano second clock
-	* always 16 characters
-    * sortable, new keys always increase (dt + random)
+Function: `createTxKey`
+File: txkey.tc
+
+* a base62 date based key unique to a specific domain
+* used for unique id in domain models
+* uses crypto to generate random numbers
+* uses process.hrtime.bigint() for high res nano second clock
+* always 12 characters
+* sortable, new keys always increase (dt + random)
 
 ### Base Model
 
