@@ -17,10 +17,16 @@ import { createTxKey } from './index';
         const key3 = await createTxKey(['domain', 'subdomain', 'identifier']);
         console.log('Generated Key 3 (multiple args):', key3);
 
-        // Example 4: Error handling - if the executable path is wrong or it fails
-        // To test this, you could temporarily set TXKEY_EXECUTABLE_PATH to './non_existent_txkey'
-        // const failedKey = await createTxKey([]);
-        // console.log(failedKey);
+        let keys: string[] = [];
+        const start = process.hrtime.bigint();
+        for (let i = 0; i < 100; i++) {
+            const key = await createTxKey(['t']);
+            keys.push(key);
+            // console.log(key);
+        }
+
+        const duration = process.hrtime.bigint() - start;
+        console.log(`it took ${duration} nanos to generate 100 keys, ${duration / 1000000n} millis`);
 
     } catch (err) {
         console.error('An error occurred during key generation:', err);
