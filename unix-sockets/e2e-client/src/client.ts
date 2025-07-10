@@ -105,20 +105,25 @@ async function makeRequest(endpoint: string, method: string = 'GET', data: any =
     }
 }
 
+function rightPad(str: string, length: number, char: string = ' '): string {
+    return str.padEnd(length, char);
+}
+
 async function testEndpoints() {
     try {
         // Example 1: GET request
-        let data = await makeRequest('/ping');
-        console.log('/ping: ', data);
+        const endpoints = [ '/', '/ping', '/date', '/time', '/iso' ];
+        const padlen = 10;
+        console.log(rightPad('Endpoint', padlen), 'micros', 'Response');
 
-        data = await makeRequest('/date');
-        console.log('/date: ', data);
+        endpoints.forEach(async endpoint => {
+            const t0 = process.hrtime.bigint();
+            const data = await makeRequest(endpoint);
+            const t1 = process.hrtime.bigint();
 
-        data = await makeRequest('/time');
-        console.log('/time: ', data);
+            console.log(rightPad(endpoint, padlen), (t1-t0) / 1000n, data);
+        });
 
-        data = await makeRequest('/iso');
-        console.log('/iso: ', data);
 
         // Example 2: POST request
         // const postData = { key: 'value' };
