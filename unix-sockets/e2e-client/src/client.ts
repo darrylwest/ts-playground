@@ -77,9 +77,8 @@ const unixFetch = async (url: string, options: any) => {
 };
 
 async function makeRequest(endpoint: string, method: string = 'GET', data: any = null) {
-    // const socketPath = '/tmp/ts-app.sock'; // Replace with your socket path
     // const socketPath: string = path.join(__dirname, '../dist/app.sock');
-    const socketPath: string = '/Users/dpw/raincity/web-projects/ts-playground/unix-sockets/dist/app.sock';
+    const socketPath: string = '../dist/app.sock';
     const url = `http://unix:${socketPath}:${endpoint}`;
 
     console.log(url);
