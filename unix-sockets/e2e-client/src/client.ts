@@ -1,15 +1,22 @@
 import fetch, { Request, Headers } from 'node-fetch';
 import * as net from 'net';
 import { URL } from 'url';
+import * as path from 'path';
 
-const socketPath = '/tmp/your_socket.sock'; // Replace with your socket path
+interface CustomResponse {
+    ok: boolean;
+    status: number;
+    headers: Record<string, string>;
+    text: () => Promise<string>;
+    json: () => Promise<any>;
+}
 
 const unixFetch = async (url: string, options: any) => {
     const urlObject = new URL(url);
     const socketPath = urlObject.hostname;
     const path = urlObject.pathname;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<CustomResponse>((resolve, reject) => {
         const client = net.connect(socketPath, () => {
             const requestHeaders = {
                 ...options.headers,
@@ -37,7 +44,7 @@ const unixFetch = async (url: string, options: any) => {
 
         client.on('end', () => {
             const [headersStr, body] = responseData.split('\r\n\r\n', 2);
-            const headers = headersStr.split('\r\n').reduce((acc, line) => {
+            const headers = headersStr.split('\r\n').reduce((acc: Record<string, string>, line) => {
                 const [key, value] = line.split(': ');
                 if (key && value) {
                     acc[key] = value;
@@ -47,7 +54,7 @@ const unixFetch = async (url: string, options: any) => {
 
             const statusCode = parseInt(headersStr.split(' ')[1], 10);
 
-            const response = {
+            const response: CustomResponse = {
                 ok: statusCode >= 200 && statusCode < 300,
                 status: statusCode,
                 headers: headers,
@@ -55,7 +62,7 @@ const unixFetch = async (url: string, options: any) => {
                 json: async () => JSON.parse(body),
             };
 
-            resolve(response as any);
+            resolve(response);
         });
 
         client.on('error', (err) => {
@@ -65,7 +72,12 @@ const unixFetch = async (url: string, options: any) => {
 };
 
 async function makeRequest(endpoint: string, method: string = 'GET', data: any = null) {
+    // const socketPath = '/tmp/ts-app.sock'; // Replace with your socket path
+    // const socketPath: string = path.join(__dirname, '../dist/app.sock');
+    const socketPath: string = '/Users/dpw/raincity/web-projects/ts-playground/unix-sockets/dist/app.sock';
     const url = `http://unix:${socketPath}:${endpoint}`;
+
+    console.log(url);
 
     const options: any = {
         method: method,
