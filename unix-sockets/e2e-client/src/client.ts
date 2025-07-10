@@ -81,8 +81,6 @@ async function makeRequest(endpoint: string, method: string = 'GET', data: any =
     const socketPath: string = '../dist/app.sock';
     const url = `http://unix:${socketPath}:${endpoint}`;
 
-    console.log(url);
-
     const options: any = {
         method: method,
         headers: {
@@ -101,6 +99,7 @@ async function makeRequest(endpoint: string, method: string = 'GET', data: any =
         }
         return await response.json();
     } catch (error) {
+        console.log(url);
         console.error('Failed to fetch:', error);
         throw error;
     }
@@ -110,16 +109,16 @@ async function testEndpoints() {
     try {
         // Example 1: GET request
         let data = await makeRequest('/ping');
-        console.log('GET Response:', data);
+        console.log('/ping: ', data);
 
         data = await makeRequest('/date');
-        console.log('GET Response:', data);
+        console.log('/date: ', data);
 
         data = await makeRequest('/time');
-        console.log('GET Response:', data);
+        console.log('/time: ', data);
 
         data = await makeRequest('/iso');
-        console.log('GET Response:', data);
+        console.log('/iso: ', data);
 
         // Example 2: POST request
         // const postData = { key: 'value' };
