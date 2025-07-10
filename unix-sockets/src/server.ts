@@ -67,18 +67,22 @@ const server: Server = app.listen(socketPath, () => {
     // and ensure your web server user is in the correct group.
     fs.chmodSync(socketPath, '660'); 
     console.log(`Server is running on socket: ${socketPath}`);
+    console.log(`Server PID: ${process.pid}`);
 });
 
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-    console.log('Shutting down server...');
-    server.close((err?: Error) => { // The callback can receive an optional Error
+// listen for these signals
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+process.on('SIGHUP', shutdown);
+
+function shutdown(signal: string) {
+    console.log(`Received signal: ${signal}. Shutting down server...`);
+    server.close((err?: Error) => {
         if (err) {
             console.error('Error during server shutdown:', err);
             process.exit(1);
         }
-        // The socket file is automatically removed when the server closes gracefully.
         console.log('Server shut down.');
         process.exit(0);
     });
-});
+}
