@@ -12,9 +12,13 @@ interface CustomResponse {
 }
 
 const unixFetch = async (url: string, options: any) => {
-    const urlObject = new URL(url);
-    const socketPath = urlObject.hostname;
-    const path = urlObject.pathname;
+    // Parse URL format: http://unix:/path/to/socket:/endpoint
+    const match = url.match(/^http:\/\/unix:(.+):(.+)$/);
+    if (!match) {
+        throw new Error('Invalid Unix socket URL format');
+    }
+    const socketPath = match[1];
+    const path = match[2];
 
     return new Promise<CustomResponse>((resolve, reject) => {
         const client = net.connect(socketPath, () => {
@@ -27,6 +31,7 @@ const unixFetch = async (url: string, options: any) => {
             for (const header in requestHeaders) {
                 requestBody += `${header}: ${requestHeaders[header]}\r\n`;
             }
+            requestBody += 'Connection: close\r\n';
             requestBody += '\r\n';
 
             if (options.body) {
@@ -105,8 +110,17 @@ async function makeRequest(endpoint: string, method: string = 'GET', data: any =
 async function testEndpoints() {
     try {
         // Example 1: GET request
-        const getData = await makeRequest('/ping');
-        console.log('GET Response:', getData);
+        let data = await makeRequest('/ping');
+        console.log('GET Response:', data);
+
+        data = await makeRequest('/date');
+        console.log('GET Response:', data);
+
+        data = await makeRequest('/time');
+        console.log('GET Response:', data);
+
+        data = await makeRequest('/iso');
+        console.log('GET Response:', data);
 
         // Example 2: POST request
         // const postData = { key: 'value' };
