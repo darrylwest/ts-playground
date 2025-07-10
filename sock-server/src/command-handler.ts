@@ -48,13 +48,13 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
     }
 
     case 'dbsize': {
-      // TODO store.size();
-      return { response: 'DB Size: Unknown (iterator not supported)' };
+      const value = await store.dbsize();
+      return { response: value };
     }
 
     case 'keys': {
-      // TODO store.keys('*')
-      return { response: 'Keys: Unknown (iterator not supported)' };
+      const value = await store.keys();
+      return { response: value };
     }
 
     case 'save': {

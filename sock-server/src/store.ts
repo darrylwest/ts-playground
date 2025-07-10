@@ -32,6 +32,16 @@ export const store = {
     return await valkey.ping();
   },
 
+  async dbsize(): Promise<string> {
+    const value = await valkey.dbsize();
+    return value.toString();
+  },
+
+  async keys(): Promise<string> {
+    const value = await valkey.keys('*');
+    return value.join(',');
+  },
+
   async *iterator(): AsyncGenerator<[string, string]> {
     const stream = valkey.scanStream({
       count: 100 
