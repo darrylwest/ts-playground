@@ -1,5 +1,16 @@
 # Express with Unix Socket
 
+A typescript service to demonstrate unix socket use.  
+Creates a http server that responds to various API calls.
+
+## API
+
+```
+/ping
+/date
+/time
+```
+
 ## Build & Run
 
 ```

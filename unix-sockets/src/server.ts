@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Server } from 'http'; // Import the Server type from Node's http module
 
+import { formatDistance, subDays } from "date-fns";
+
 const app: Application = express();
 const socketPath: string = path.join(__dirname, 'app.sock');
 
@@ -27,6 +29,18 @@ try {
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Express app via a Unix socket!');
+});
+
+app.get('/ping', (req: Request, res: Response) => {
+    res.send('pong');
+});
+
+app.get('/date', (req: Request, res: Response) => {
+    res.send('current date: ');
+});
+
+app.get('/time', (req: Request, res: Response) => {
+    res.send('current time');
 });
 
 app.get('/api/get/:key', (req: Request, res: Response) => {
