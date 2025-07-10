@@ -38,4 +38,13 @@ The server exposes a TCP-based API on the port specified in the configuration fi
 *   **`txkey`**: Generates a new timestamp-based key.
 *   **`rtkey`**: Generates a new route-based key.
 
-###### dpw | 2025.07.08 | 81UteFYAocl8
+## Use
+
+* mk start
+* mk attach
+
+## Valkey
+
+_Look in src/store.ts for basic valkey commands._
+
+###### dpw | 2025.07.10 | 81UteFYAocl8
