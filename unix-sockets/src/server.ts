@@ -28,33 +28,34 @@ try {
 }
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello from your Express app via a Unix socket!');
+    const body = {"message": 'Hello from your Express app via a Unix socket!'};
+    res.send(JSON.stringify(body));
 });
 
 app.get('/ping', (req: Request, res: Response) => {
-    res.send('pong');
+    res.send(JSON.stringify({"ping": "pong"}));
 });
 
 // format tokens: https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
 app.get('/date', (req: Request, res: Response) => {
     const dt: string = format(new Date(), "yyyy-MM-dd");
-    res.send('current date: ' + dt);
+    res.send(JSON.stringify({ date: dt }));
 });
 
 app.get('/time', (req: Request, res: Response) => {
     const tm: string = format(new Date(), "HH:mm");
-    res.send('current time: ' + tm);
+    res.send(JSON.stringify({ time: tm }));
 });
 
 app.get('/iso', (req: Request, res: Response) => {
     const now: string = formatISO(new Date());
-    res.send('current date-time iso: ' + now);
+    res.send(JSON.stringify({ iso_now: now }));
 });
 
 app.get('/api/get/:key', (req: Request, res: Response) => {
     const key: string = req.params.key;
     console.log(key);
-    res.send("here is the key: " + key);
+    res.send(JSON.stringify({"key": key}));
 });
 
 // Instead of app.listen(3000), we listen on the file path.
