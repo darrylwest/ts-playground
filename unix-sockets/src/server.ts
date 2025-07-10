@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Server } from 'http'; // Import the Server type from Node's http module
 
-import { formatDistance, subDays } from "date-fns";
+import { format, formatISO, parse, parseISO } from "date-fns";
 
 const app: Application = express();
 const socketPath: string = path.join(__dirname, 'app.sock');
@@ -35,12 +35,20 @@ app.get('/ping', (req: Request, res: Response) => {
     res.send('pong');
 });
 
+// format tokens: https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
 app.get('/date', (req: Request, res: Response) => {
-    res.send('current date: ');
+    const dt: string = format(new Date(), "yyyy-MM-dd");
+    res.send('current date: ' + dt);
 });
 
 app.get('/time', (req: Request, res: Response) => {
-    res.send('current time');
+    const tm: string = format(new Date(), "HH:mm");
+    res.send('current time: ' + tm);
+});
+
+app.get('/iso', (req: Request, res: Response) => {
+    const now: string = formatISO(new Date());
+    res.send('current date-time iso: ' + now);
 });
 
 app.get('/api/get/:key', (req: Request, res: Response) => {
