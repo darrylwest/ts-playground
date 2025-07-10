@@ -57,6 +57,11 @@ export const handleCommand = async (data: Buffer): Promise<CommandResponse> => {
       return { response: value };
     }
 
+    case 'find': {
+      const values = await store.findKeys();
+      return { response: JSON.stringify( values ) };
+    }
+
     case 'save': {
       return { response: 'OK' };
     }
