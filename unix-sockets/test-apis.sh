@@ -11,3 +11,10 @@ do
     curl --unix-socket ./dist/app.sock http://localhost/$api
     printf "\n"
 done
+
+key=`txkey`
+printf "api/get/:key: "
+curl --unix-socket ./dist/app.sock "http://localhost/api/get/$key"
+
+printf "\n"
+

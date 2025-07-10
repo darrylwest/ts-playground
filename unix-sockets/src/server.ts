@@ -65,7 +65,7 @@ const server: Server = app.listen(socketPath, () => {
     // This allows the web server (e.g., Nginx) to access it.
     // 777 is permissive for demonstration; in production, you might use 660
     // and ensure your web server user is in the correct group.
-    fs.chmodSync(socketPath, '777'); 
+    fs.chmodSync(socketPath, '660'); 
     console.log(`Server is running on socket: ${socketPath}`);
 });
 
