@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-/*
-export function createTxKey(): string {
-  const key = Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
-  return key.substring(0, 12);
-}
-*/
-
 export enum BaseStatus {
   New = "new",
   Pending = "pending",
@@ -19,20 +12,24 @@ export enum BaseStatus {
 }
 
 export const BaseSchema = z.object({
-  key: z.string().length(12), // use createTxKey() to create a 12 char short key
+  key: z.string().length(16), // use createRouteKey() to create a 16 char short key
   dateCreated: z.number(),   // Date.now()
   lastUpdated: z.number(),   // Date.now()
   version: z.number().gte(0),       // for optimistic locking
-  status: z.nativeEnum(BaseStatus), // Corrected to z.nativeEnum
+  status: z.enum(BaseStatus), // Corrected to z.nativeEnum
 });
 
-export const ContactSchema = BaseSchema.extend({
+export const PersonSchema = BaseSchema.extend({
   first_name: z.string().optional(),              // optional
   last_name: z.string().optional(),               // optional
   email: z.string().email(),                    // required
   phone: z.string().optional(),                   // optional
   ip_address: z.string(),               // required
   details: z.map(z.string(), z.string()).optional(),    // optional
+});
+
+export const ContactSchema = PersonSchema.extend({
+  key: z.string().length(16).startsWith('con:'),
 });
 
 export const AddressSchema = z.object({
@@ -48,7 +45,8 @@ export const AddressSchema = z.object({
     .optional(), // [latitude, longitude]
 });
 
-export const UserSchema = ContactSchema.extend({
+export const UserSchema = PersonSchema.extend({
+  key: z.string().length(16).startsWith('usr:'),
   roles: z.string(),                          // the roles that this user is authorized for
   preferences: z.map(z.string(), z.string()).optional(),      // specific preference settings
   company_name: z.string().optional(),                  // optional name of the company affiliation

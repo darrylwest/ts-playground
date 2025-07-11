@@ -17,8 +17,8 @@ describe('File Loading and Parsing', () => {
   describe('loadAndParseContacts', () => {
     it('should load and parse contacts from a JSON file', async () => {
       const mockContactData = {
-        'contact12345': {
-          key: 'contact12345',
+        'con:contact12345': {
+          key: 'con:contact12345',
           dateCreated: 1625097600000,
           lastUpdated: 1625097600000,
           version: 1,
@@ -38,13 +38,13 @@ describe('File Loading and Parsing', () => {
       const contacts = await loadAndParseContacts('dummy/path/contacts.json');
       
       const expectedContact = {
-        ...mockContactData['contact12345'],
-        details: new Map(Object.entries(mockContactData['contact12345'].details)),
+        ...mockContactData['con:contact12345'],
+        details: new Map(Object.entries(mockContactData['con:contact12345'].details)),
       };
 
       expect(contacts).toBeInstanceOf(Map);
       expect(contacts.size).toBe(1);
-      expect(contacts.get('contact12345')).toEqual(expectedContact);
+      expect(contacts.get('con:contact12345')).toEqual(expectedContact);
       expect(() => ContactMap.parse(contacts)).not.toThrow();
     });
 
@@ -62,8 +62,8 @@ describe('File Loading and Parsing', () => {
   describe('loadAndParseUsers', () => {
     it('should load and parse users from a JSON file', async () => {
       const mockUserData = {
-        'user12345678': {
-          key: 'user12345678',
+        'usr:user12345678': {
+          key: 'usr:user12345678',
           dateCreated: 1625097600000,
           lastUpdated: 1625097600000,
           version: 1,
@@ -82,13 +82,13 @@ describe('File Loading and Parsing', () => {
       const users = await loadAndParseUsers('dummy/path/users.json');
 
       const expectedUser = {
-        ...mockUserData['user12345678'],
-        preferences: new Map(Object.entries(mockUserData['user12345678'].preferences)),
+        ...mockUserData['usr:user12345678'],
+        preferences: new Map(Object.entries(mockUserData['usr:user12345678'].preferences)),
       };
 
       expect(users).toBeInstanceOf(Map);
       expect(users.size).toBe(1);
-      expect(users.get('user12345678')).toEqual(expectedUser);
+      expect(users.get('usr:user12345678')).toEqual(expectedUser);
       expect(() => UserMap.parse(users)).not.toThrow();
     });
 

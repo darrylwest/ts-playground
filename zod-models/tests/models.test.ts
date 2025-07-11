@@ -1,24 +1,13 @@
-import { 
-  BaseSchema, 
-  ContactSchema, 
-  UserSchema, 
+import {
+  BaseSchema,
+  ContactSchema,
+  UserSchema,
   AddressSchema,
   ContactMap,
-  UserMap
+  UserMap,
+  BaseStatus
 } from '../src/models';
-import { createTxKey } from '../src/txkey';
-
-// Mock enum for testing
-enum BaseStatus {
-  New = "new",
-  Pending = "pending",
-  Active = "active",
-  Inactive = "inactive",
-  Verified = "verified",
-  Deleted = "deleted",
-  Shipped = "shipped",
-  Completed = "completed",
-}
+import { createTxKey, createRouteKey } from '../src/txkey';
 
 describe('BaseSchema', () => {
   it('should validate correct base data', async () => {
@@ -34,18 +23,8 @@ describe('BaseSchema', () => {
     expect(result).toEqual(validBase);
   });
 
-  it('should reject invalid key length', async () => {
-    const invalidBase = {
-      key: "short",
-      dateCreated: Date.now(),
-      lastUpdated: Date.now(),
-      version: 1,
-      status: BaseStatus.Active
-    };
-
-    // This test is no longer valid as createTxKey will always return a 12 character key
-    // expect(() => BaseSchema.parse(invalidBase)).toThrow();
-  });
+  // The key length is no longer strictly 12 for BaseSchema, so this test is removed.
+  // Specific key length and prefix validation will be handled by ContactSchema and UserSchema.
 
   it('should reject invalid status', async () => {
     const invalidBase = {
@@ -101,7 +80,7 @@ describe('AddressSchema', () => {
 describe('ContactSchema', () => {
   it('should validate complete contact', async () => {
     const validContact = {
-      key: await createTxKey(),
+      key: await createRouteKey('con'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -120,7 +99,7 @@ describe('ContactSchema', () => {
 
   it('should validate minimal contact', async () => {
     const minimalContact = {
-      key: await createTxKey(),
+      key: await createRouteKey('con'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -135,7 +114,7 @@ describe('ContactSchema', () => {
 
   it('should reject invalid email', async () => {
     const invalidContact = {
-      key: await createTxKey(),
+      key: await createRouteKey('con'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -149,7 +128,7 @@ describe('ContactSchema', () => {
 
   it('should accept any IP address string', async () => {
     const validContact = {
-      key: await createTxKey(),
+      key: await createRouteKey('con'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -161,12 +140,38 @@ describe('ContactSchema', () => {
     const result = ContactSchema.parse(validContact);
     expect(result).toEqual(validContact);
   });
+
+  it('should reject key with wrong prefix', async () => {
+    const invalidContact = {
+      key: await createRouteKey('bad'),
+      dateCreated: Date.now(),
+      lastUpdated: Date.now(),
+      version: 1,
+      status: BaseStatus.Active,
+      email: "test@example.com",
+      ip_address: "192.168.1.1"
+    };
+    expect(() => ContactSchema.parse(invalidContact)).toThrow();
+  });
+
+  it('should reject key with incorrect length', async () => {
+    const invalidContact = {
+      key: 'con:short',
+      dateCreated: Date.now(),
+      lastUpdated: Date.now(),
+      version: 1,
+      status: BaseStatus.Active,
+      email: "test@example.com",
+      ip_address: "192.168.1.1"
+    };
+    expect(() => ContactSchema.parse(invalidContact)).toThrow();
+  });
 });
 
 describe('UserSchema', () => {
   it('should validate complete user', async () => {
     const validUser = {
-      key: await createTxKey(),
+      key: await createRouteKey('usr'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -195,7 +200,7 @@ describe('UserSchema', () => {
 
   it('should validate minimal user', async () => {
     const minimalUser = {
-      key: await createTxKey(),
+      key: await createRouteKey('usr'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -211,7 +216,7 @@ describe('UserSchema', () => {
 
   it('should reject missing roles', async () => {
     const invalidUser = {
-      key: await createTxKey(),
+      key: await createRouteKey('usr'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -223,13 +228,41 @@ describe('UserSchema', () => {
 
     expect(() => UserSchema.parse(invalidUser)).toThrow();
   });
+
+  it('should reject key with wrong prefix', async () => {
+    const invalidUser = {
+      key: await createRouteKey('bad'),
+      dateCreated: Date.now(),
+      lastUpdated: Date.now(),
+      version: 1,
+      status: BaseStatus.Active,
+      email: "test@example.com",
+      ip_address: "192.168.1.1",
+      roles: "user"
+    };
+    expect(() => UserSchema.parse(invalidUser)).toThrow();
+  });
+
+  it('should reject key with incorrect length', async () => {
+    const invalidUser = {
+      key: 'usr:short',
+      dateCreated: Date.now(),
+      lastUpdated: Date.now(),
+      version: 1,
+      status: BaseStatus.Active,
+      email: "test@example.com",
+      ip_address: "192.168.1.1",
+      roles: "user"
+    };
+    expect(() => UserSchema.parse(invalidUser)).toThrow();
+  });
 });
 
 describe('ContactMap', () => {
   it('should validate map of contacts', async () => {
     const contacts = new Map();
     const contact = {
-      key: await createTxKey(),
+      key: await createRouteKey('con'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -247,7 +280,7 @@ describe('ContactMap', () => {
   it('should reject invalid contact in map', async () => {
     const contacts = new Map();
     const invalidContact = {
-      key: await createTxKey(),
+      key: await createRouteKey('bad'), // Invalid prefix
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -266,7 +299,7 @@ describe('UserMap', () => {
   it('should validate map of users', async () => {
     const users = new Map();
     const user = {
-      key: await createTxKey(),
+      key: await createRouteKey('usr'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -285,14 +318,14 @@ describe('UserMap', () => {
   it('should reject invalid user in map', async () => {
     const users = new Map();
     const invalidUser = {
-      key: await createTxKey(),
+      key: await createRouteKey('bad'), // Invalid prefix
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
       status: BaseStatus.Active,
       email: "test@example.com",
-      ip_address: "192.168.1.1"
-      // missing roles
+      ip_address: "192.168.1.1",
+      roles: "user"
     };
     
     users.set(invalidUser.key, invalidUser);

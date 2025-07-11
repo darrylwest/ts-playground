@@ -10,6 +10,11 @@ const execPromise = promisify(exec);
 // On Ubuntu/macOS: '/usr/local/bin/txkey'
 const TXKEY_EXECUTABLE_PATH = '/usr/local/bin/txkey'; // or look up from config
 
+export async function createRouteKey(prefix: string): Promise<string> {
+    const txKey = await createTxKey();
+    return `${prefix}:${txKey}`;
+}
+
 /**
  * Generates a key by invoking an external 'txkey' executable.
  * The 'txkey' executable is expected to take arguments and print the

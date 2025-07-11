@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { UserSchema, AddressSchema, BaseStatus } from '../src/models';
+import { createRouteKey } from '../src/txkey';
 import { createTxKey } from '../src/txkey';
 import { z } from 'zod';
 
@@ -22,7 +23,7 @@ function generateRandomAddress(): z.infer<typeof AddressSchema> {
 }
 
 async function generateRandomUser(): Promise<z.infer<typeof UserSchema>> {
-  const key = await createTxKey();
+  const key = await createRouteKey('usr');
   const now = Date.now();
   const firstName = `UserFirstName${Math.random().toString(36).substring(2, 7)}`;
   const lastName = `UserLastName${Math.random().toString(36).substring(2, 7)}`;

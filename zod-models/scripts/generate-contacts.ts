@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { ContactSchema, BaseStatus } from '../src/models';
-import { createTxKey } from '../src/txkey';
+import { createRouteKey } from '../src/txkey';
 import { z } from 'zod';
 
 const statuses = Object.values(BaseStatus);
@@ -10,7 +10,7 @@ function getRandomElement<T>(arr: T[]): T {
 }
 
 async function generateRandomContact(): Promise<z.infer<typeof ContactSchema>> {
-  const key = await createTxKey();
+  const key = await createRouteKey('con');
   const now = Date.now();
   const firstName = `FirstName${Math.random().toString(36).substring(2, 7)}`;
   const lastName = `LastName${Math.random().toString(36).substring(2, 7)}`;
