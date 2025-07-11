@@ -50,3 +50,7 @@ export const UserSchema = ContactSchema.extend({
   company_name: z.string().optional(),                  // optional name of the company affiliation
   addresses: z.array(AddressSchema).optional(),             // array of addresses (home, work, billing, etc.)
 });
+
+// Zod map schemas for data storage
+export const ContactMap = z.map(z.string(), ContactSchema);
+export const UserMap = z.map(z.string(), UserSchema);

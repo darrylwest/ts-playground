@@ -13,7 +13,7 @@ This is a TypeScript demo application that tests data model schemas using Zod. T
 - **Schema Hierarchy**: 
   - `BaseSchema` → `ContactSchema` → `UserSchema`
   - `AddressSchema` (standalone, used as array in UserSchema)
-- **Data Storage**: Models are stored in Maps (`contacts = Map<string, ContactSchema>()`, `users = Map<string, UserSchema>()`)
+- **Data Storage**: Models are stored in Zod maps (`const ContactMap = z.map(z.string(), ContactSchema)`, `const UserMap = z.map(z.string(), UserSchema)`)
 - **Persistence**: Models are JSON.stringify'd and written to disk
 
 ## Development Commands
@@ -27,7 +27,7 @@ Based on the README requirements, the following structure needs to be implemente
 
 1. **Main Entry Point**: Create an index file that:
    - Populates models in various ways
-   - Stores data in Maps (contacts, users)
+   - Stores data in Zod maps (ContactMap, UserMap)
    - JSON.stringify's and writes models to disk
 
 2. **Testing Framework**: Set up Jest for unit testing
