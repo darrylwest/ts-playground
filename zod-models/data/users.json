@@ -1,8 +1,8 @@
 {
-  "mcz4ojo1p5ah": {
-    "key": "mcz4ojo1p5ah",
-    "dateCreated": 1752257178001,
-    "lastUpdated": 1752257178001,
+  "mcz99872pgna": {
+    "key": "mcz99872pgna",
+    "dateCreated": 1752264861374,
+    "lastUpdated": 1752264861374,
     "version": 1,
     "status": "active",
     "first_name": "Alice",
@@ -22,15 +22,17 @@
         "city": "Anytown",
         "state": "CA",
         "zip": "12345",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "latlng": [
+          37.7749,
+          -122.4194
+        ]
       }
     ]
   },
-  "mcz4ojo2lkcg": {
-    "key": "mcz4ojo2lkcg",
-    "dateCreated": 1752257178002,
-    "lastUpdated": 1752257178002,
+  "mcz998732aue": {
+    "key": "mcz998732aue",
+    "dateCreated": 1752264861375,
+    "lastUpdated": 1752264861375,
     "version": 1,
     "status": "new",
     "email": "bob.wilson@company.com",
