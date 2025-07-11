@@ -29,5 +29,6 @@ npm start
 
 * [date-fms docs](https://date-fns.org/v4.1.0/docs/Getting-Started)
 * [Datetime Format Tokens](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
+* [zod validation](https://zod.dev/)
 
 ###### dpw | 2025-07-08 | 81UnbyMrTXtu

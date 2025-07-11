@@ -5,10 +5,32 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Server } from 'http'; // Import the Server type from Node's http module
 
-import { format, formatISO, parse, parseISO } from "date-fns";
+import { format, formatISO, parse, parseISO, isValid } from "date-fns";
+import { z } from 'zod';
 
 const app: Application = express();
 const socketPath: string = path.join(__dirname, 'app.sock');
+
+// date parse validation 
+const ISODateString = z.string().refine((val) => {
+  try {
+    const parsedDate = parseISO(val);
+    return isValid(parsedDate);
+  } catch (e) {
+    return false;
+  }
+});
+
+function parseISODate(isoString: string): Date | null {
+  const result = ISODateString.safeParse(isoString);
+
+  if (result.success) {
+    return parseISO(isoString);
+  } 
+
+  console.warn(`invalid date string: ${isoString}`, result.error);
+  return null;
+}
 
 // --- Crucial: Clean up the socket file before starting ---
 // If the server crashes, the socket file may not be removed,
@@ -50,6 +72,17 @@ app.get('/time', (req: Request, res: Response) => {
 app.get('/iso', (req: Request, res: Response) => {
     const now: string = formatISO(new Date());
     res.send(JSON.stringify({ iso_now: now }));
+});
+
+app.get('/parse/:iso', (req: Request, res: Response) => {
+    const iso: string = req.params.iso;
+    const tm = parseISODate(iso);
+    if (tm) {
+      console.log('ok: ', tm.getTime());
+      res.send(JSON.stringify({ parsed: iso, value: formatISO(tm), time: tm.getTime() }));
+    } else {
+      res.send(JSON.stringify({ error: iso  }));
+    }
 });
 
 app.get('/api/get/:key', (req: Request, res: Response) => {
