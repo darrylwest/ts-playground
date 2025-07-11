@@ -81,4 +81,21 @@ describe('createTxKey Integration Tests', () => {
         expect(typeof result).toBe('string');
         expect(result.length).toBeGreaterThan(0);
     });
+
+    it('should throw an error if the executable fails', async () => {
+        // Mock execPromise to simulate an error
+        const mockExecPromise = jest.spyOn(require('util'), 'promisify').mockImplementation((execFn) => {
+            return jest.fn(() => {
+                throw new Error('Command failed');
+            });
+        });
+
+        // Re-import createTxKey after mocking promisify
+        const { createTxKey } = require('../src/txkey');
+
+        const badPath = '/path/to/nonexistent/txkey';
+        await expect(createTxKey(badPath)).rejects.toThrow('Failed to generate key using external \'txkey\' executable. Details: Command failed');
+
+        mockExecPromise.mockRestore(); // Clean up the mock
+    });
 });

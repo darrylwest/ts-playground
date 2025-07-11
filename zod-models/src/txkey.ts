@@ -30,7 +30,7 @@ export async function createTxKey(path: string, args: string[] = []): Promise<st
     // Ensure arguments are properly quoted if they might contain spaces or special characters.
     // For a simple string like '81WPUUnaM3Fn', quoting might not be strictly necessary,
     // but it's good practice for robustness.
-    const command = `${TXKEY_EXECUTABLE_PATH} ${args.map(arg => `'${arg}'`).join(' ')}`;
+    const command = `${path} ${args.map(arg => `'${arg}'`).join(' ')}`;
 
     try {
         const { stdout, stderr } = await execPromise(command);

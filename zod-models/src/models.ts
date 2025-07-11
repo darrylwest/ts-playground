@@ -22,7 +22,7 @@ export const BaseSchema = z.object({
 export const PersonSchema = BaseSchema.extend({
   first_name: z.string().optional(),              // optional
   last_name: z.string().optional(),               // optional
-  email: z.string().email(),                    // required
+  email: z.email(),                    // required
   phone: z.string().optional(),                   // optional
   ip_address: z.string(),               // required
   details: z.map(z.string(), z.string()).optional(),    // optional
