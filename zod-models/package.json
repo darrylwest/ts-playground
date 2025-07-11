@@ -10,7 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "gen:users": "npx ts-node scripts/generate-users.ts",
+    "gen:contacts": "npx ts-node scripts/generate-contacts.ts"
   },
   "keywords": [],
   "author": "",
