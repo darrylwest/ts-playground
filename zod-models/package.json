@@ -9,7 +9,7 @@
     "dev": "tsc && node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:cov": "jest --coverage",
     "clean": "rm -rf dist"
   },
   "keywords": [],

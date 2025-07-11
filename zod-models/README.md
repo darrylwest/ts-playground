@@ -1,5 +1,6 @@
 # Zod Models
 
+CLAUDE: This is a Typescript Playground project.
 
 This is a demo typescript application to test data model schemas using zod. 
 
