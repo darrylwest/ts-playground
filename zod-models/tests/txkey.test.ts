@@ -1,4 +1,4 @@
-import { createTxKey } from '../src/txkey';
+import { createTxKey, TXKEY_EXECUTABLE_PATH } from '../src/txkey';
 
 // Simple integration test that actually calls the txkey binary
 describe('createTxKey Integration Tests', () => {
@@ -13,7 +13,8 @@ describe('createTxKey Integration Tests', () => {
     });
 
     it('should call txkey binary and return a key', async () => {
-        const result = await createTxKey([]);
+        const path = TXKEY_EXECUTABLE_PATH;
+        const result = await createTxKey(path, []);
         
         // Should return a string (the actual key from txkey binary)
         expect(typeof result).toBe('string');
@@ -23,21 +24,24 @@ describe('createTxKey Integration Tests', () => {
     });
 
     it('should handle arguments passed to txkey binary', async () => {
-        const result = await createTxKey(['testarg']);
+        const path = TXKEY_EXECUTABLE_PATH;
+        const result = await createTxKey(path, ['testarg']);
         
         expect(typeof result).toBe('string');
         expect(result.length).toBeGreaterThan(0);
     });
 
     it('should handle multiple arguments', async () => {
-        const result = await createTxKey(['arg1', 'arg2', 'arg3']);
+        const path = TXKEY_EXECUTABLE_PATH;
+        const result = await createTxKey(path, ['arg1', 'arg2', 'arg3']);
         
         expect(typeof result).toBe('string');
         expect(result.length).toBeGreaterThan(0);
     });
 
     it('should handle arguments with special characters', async () => {
-        const result = await createTxKey(['arg with spaces', 'arg$with$special']);
+        const path = TXKEY_EXECUTABLE_PATH;
+        const result = await createTxKey(path, ['arg with spaces', 'arg$with$special']);
         
         expect(typeof result).toBe('string');
         expect(result.length).toBeGreaterThan(0);
@@ -47,7 +51,8 @@ describe('createTxKey Integration Tests', () => {
         // Test that the function exists and can be called
         expect(typeof createTxKey).toBe('function');
         // Test that it returns a promise
-        const result = createTxKey([]);
+        const path = TXKEY_EXECUTABLE_PATH;
+        const result = createTxKey(path, []);
         expect(result).toBeInstanceOf(Promise);
     });
 
@@ -58,7 +63,8 @@ describe('createTxKey Integration Tests', () => {
         
         try {
             // Try with different argument patterns that might generate warnings
-            await createTxKey(['--verbose']);
+            const path = TXKEY_EXECUTABLE_PATH;
+            await createTxKey(path, ['--verbose']);
         } catch (error) {
             // If it fails, that's also a valid test of error handling
             expect(error).toBeInstanceOf(Error);
@@ -68,8 +74,9 @@ describe('createTxKey Integration Tests', () => {
     });
 
     it('should handle very long argument strings', async () => {
+        const path = TXKEY_EXECUTABLE_PATH;
         const longArg = 'a'.repeat(1000);
-        const result = await createTxKey([longArg]);
+        const result = await createTxKey(path, [longArg]);
         
         expect(typeof result).toBe('string');
         expect(result.length).toBeGreaterThan(0);

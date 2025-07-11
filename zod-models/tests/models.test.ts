@@ -7,12 +7,12 @@ import {
   UserMap,
   BaseStatus
 } from '../src/models';
-import { createTxKey, createRouteKey } from '../src/txkey';
+import { createRouteKey } from '../src/txkey';
 
 describe('BaseSchema', () => {
   it('should validate correct base data', async () => {
     const validBase = {
-      key: await createTxKey(),
+      key: await createRouteKey('pub'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
@@ -28,7 +28,7 @@ describe('BaseSchema', () => {
 
   it('should reject invalid status', async () => {
     const invalidBase = {
-      key: await createTxKey(),
+      key: await createRouteKey('pub'),
       dateCreated: Date.now(),
       lastUpdated: Date.now(),
       version: 1,
