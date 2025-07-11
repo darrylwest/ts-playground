@@ -5,7 +5,7 @@ export function createTxKey(): string {
   return key.substring(0, 12);
 }
 
-enum BaseStatus {
+export enum BaseStatus {
   New = "new",
   Pending = "pending",
   Active = "active",
@@ -29,7 +29,7 @@ export const ContactSchema = BaseSchema.extend({
   last_name: z.string().optional(),               // optional
   email: z.string().email(),                    // required
   phone: z.string().optional(),                   // optional
-  ip_address: z.string().ip(),               // required
+  ip_address: z.string(),               // required
   details: z.map(z.string(), z.string()).optional(),    // optional
 });
 
