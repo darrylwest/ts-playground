@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
-import { UserSchema, AddressSchema, createTxKey, BaseStatus } from '../src/models';
+import { UserSchema, AddressSchema, BaseStatus } from '../src/models';
+import { createTxKey } from '../src/txkey';
 import { z } from 'zod';
 
 const statuses = Object.values(BaseStatus);
@@ -20,8 +21,8 @@ function generateRandomAddress(): z.infer<typeof AddressSchema> {
   return AddressSchema.parse(address);
 }
 
-function generateRandomUser(): z.infer<typeof UserSchema> {
-  const key = createTxKey();
+async function generateRandomUser(): Promise<z.infer<typeof UserSchema>> {
+  const key = await createTxKey();
   const now = Date.now();
   const firstName = `UserFirstName${Math.random().toString(36).substring(2, 7)}`;
   const lastName = `UserLastName${Math.random().toString(36).substring(2, 7)}`;
@@ -50,7 +51,7 @@ async function generateAndSaveUsers(count: number, filePath: string) {
   const users: { [key: string]: any } = {};
 
   for (let i = 0; i < count; i++) {
-    const user = generateRandomUser();
+    const user = await generateRandomUser();
     users[user.key] = {
       ...user,
       preferences: user.preferences ? Object.fromEntries(user.preferences) : undefined,

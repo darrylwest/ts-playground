@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
-import { ContactSchema, createTxKey, BaseStatus } from '../src/models';
+import { ContactSchema, BaseStatus } from '../src/models';
+import { createTxKey } from '../src/txkey';
 import { z } from 'zod';
 
 const statuses = Object.values(BaseStatus);
@@ -8,8 +9,8 @@ function getRandomElement<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function generateRandomContact(): z.infer<typeof ContactSchema> {
-  const key = createTxKey();
+async function generateRandomContact(): Promise<z.infer<typeof ContactSchema>> {
+  const key = await createTxKey();
   const now = Date.now();
   const firstName = `FirstName${Math.random().toString(36).substring(2, 7)}`;
   const lastName = `LastName${Math.random().toString(36).substring(2, 7)}`;
@@ -35,7 +36,7 @@ async function generateAndSaveContacts(count: number, filePath: string) {
   const contacts: { [key: string]: any } = {};
 
   for (let i = 0; i < count; i++) {
-    const contact = generateRandomContact();
+    const contact = await generateRandomContact();
     contacts[contact.key] = {
       ...contact,
       details: contact.details ? Object.fromEntries(contact.details) : undefined,

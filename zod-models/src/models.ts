@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
+/*
 export function createTxKey(): string {
   const key = Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
   return key.substring(0, 12);
 }
+*/
 
 export enum BaseStatus {
   New = "new",
