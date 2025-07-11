@@ -81,8 +81,7 @@ describe('AddressSchema', () => {
       city: "Anytown",
       state: "CA",
       zip: "12345",
-      latitude: 37.7749,
-      longitude: -122.4194
+      latlng: [ 37.7749, -122.4194 ], // [latitude, longitude]
     };
 
     const result = AddressSchema.parse(validAddress);

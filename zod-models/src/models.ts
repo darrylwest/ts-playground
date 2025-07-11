@@ -20,7 +20,7 @@ export const BaseSchema = z.object({
   key: z.string().length(12), // use createTxKey() to create a 12 char short key
   dateCreated: z.number(),   // Date.now()
   lastUpdated: z.number(),   // Date.now()
-  version: z.number(),       // for optimistic locking
+  version: z.number().gte(0),       // for optimistic locking
   status: z.nativeEnum(BaseStatus), // Corrected to z.nativeEnum
 });
 
@@ -40,8 +40,10 @@ export const AddressSchema = z.object({
   city: z.string(),         // required
   state: z.string(),        // required
   zip: z.string(),          // required
-  latitude: z.number().optional(),    // optional
-  longitude: z.number().optional(),   // optional
+  // latitude and longitude as a tuple, both optional
+  latlng: z
+    .tuple([z.number(), z.number()])
+    .optional(), // [latitude, longitude]
 });
 
 export const UserSchema = ContactSchema.extend({
