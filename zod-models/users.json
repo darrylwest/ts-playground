@@ -1,0 +1,41 @@
+{
+  "mcz4ojo1p5ah": {
+    "key": "mcz4ojo1p5ah",
+    "dateCreated": 1752257178001,
+    "lastUpdated": 1752257178001,
+    "version": 1,
+    "status": "active",
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "email": "alice.johnson@company.com",
+    "phone": "555-5678",
+    "ip_address": "172.16.0.1",
+    "roles": "admin,user",
+    "preferences": {
+      "theme": "dark",
+      "notifications": "enabled"
+    },
+    "company_name": "Tech Corp",
+    "addresses": [
+      {
+        "addr1": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345",
+        "latitude": 37.7749,
+        "longitude": -122.4194
+      }
+    ]
+  },
+  "mcz4ojo2lkcg": {
+    "key": "mcz4ojo2lkcg",
+    "dateCreated": 1752257178002,
+    "lastUpdated": 1752257178002,
+    "version": 1,
+    "status": "new",
+    "email": "bob.wilson@company.com",
+    "ip_address": "192.168.0.10",
+    "roles": "user",
+    "company_name": "StartupXYZ"
+  }
+}
