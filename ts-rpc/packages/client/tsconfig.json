@@ -5,7 +5,7 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "outDir": "dist"
   },
   "include": ["src"]
 }
