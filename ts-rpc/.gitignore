@@ -1,0 +1,6 @@
+node_modules
+errors.txt
+coverage
+dist
+*error*.txt
+.env

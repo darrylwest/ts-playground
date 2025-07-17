@@ -1,0 +1,20 @@
+node_modules
+errors.txt
+coverage
+dist
+*error*.txt
+gen-lang-client-0251260654-fd680a445340.json
+google-credentials.json
+
+# Environment variables
+.env
+.env*.local
+.env.vault
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Other
+.DS_Store

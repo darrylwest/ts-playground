@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                // A modern Node.js version
+    "module": "commonjs",               // The standard for most Node.js apps
+    "lib": ["ES2022"],
+    "esModuleInterop": true,            // Allows for cleaner imports
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                     // Enables all strict type-checking options
+    "skipLibCheck": true,               // Skips type checking of declaration files
+    "moduleResolution": "node",         // <-- THE CRUCIAL SETTING
+    "resolveJsonModule": true           // enables reading the package.json for version
+  }
+}
