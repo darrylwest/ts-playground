@@ -32,4 +32,6 @@ npm start
 * [zod validation](https://zod.dev/)
 * [zod tutorial](https://www.youtube.com/watch?v=L6BE-U3oy80&t=33s)
 
-###### dpw | 2025-07-11 | 81UnbyMrTXtu
+**Tested on droplet**
+
+###### dpw | 2025-07-19
