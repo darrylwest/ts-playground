@@ -31,3 +31,32 @@ The Plan: Google Calendar Booking Webhook (v2)
 1. Use ngrok for Local Testing: Expose your local server to the internet to receive real notifications from Google during development.
 2. Deployment: Plan for deploying the Node.js app to a permanent cloud host.
 
+
+## Deployment to Droplet Fix
+
+**Background**: The application failed to build on the droplet, so I modified the build command to this:
+
+``json
+"scripts": {
+  "build": "NODE_OPTIONS='--max_old_space_size=4096' tsc"
+}
+```
+
+1. **Node.js Memory Limits:**
+
+* Node.js, by default, has a limited amount of memory allocated for its heap (the area where it stores variables and objects). This limit is typically around 512MB for 32-bit systems and 1GB for 64-bit systems.
+* When compiling large TypeScript projects, the tsc (TypeScript compiler) process can exceed this default memory limit, leading to the "JavaScript heap out of memory" error.
+
+2. **NODE_OPTIONS Environment Variable:**
+
+* NODE_OPTIONS is an environment variable that allows you to pass command-line options to the Node.js runtime.
+* By setting NODE_OPTIONS="--max_old_space_size=4096", you're instructing Node.js to increase the maximum memory that can be used by the "old generation" heap to 4GB (4096MB). The "old generation" heap is where long-lived objects are stored, which is relevant during the compilation process.
+
+3. **Why This Works:*
+
+* Increasing the heap size gives the tsc process more room to operate, preventing it from running out of memory when dealing with large or complex TypeScript codebases.
+
+**NOTE**: _If you encounter a "JavaScript heap out of memory" error during the `npm run build` process, it means the TypeScript compiler is running out of memory. This can happen with larger projects. To resolve this, increase the Node.js memory limit by setting the `NODE_OPTIONS` environment variable._
+
+
+###### dpw | 2025.07.19
