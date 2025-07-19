@@ -47,4 +47,6 @@ The server exposes a TCP-based API on the port specified in the configuration fi
 
 _Look in src/store.ts for basic valkey commands._
 
-###### dpw | 2025.07.10 | 81UteFYAocl8
+**Tested on droplet**
+
+###### dpw | 2025.07.19

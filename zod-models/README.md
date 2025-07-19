@@ -17,4 +17,7 @@ The unit tests should also provide test coverage.
 
 Compiled code should go in the dist folder
 
+**Tested on droplet**
+
+###### dpw | 2025.07.19
 
