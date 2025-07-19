@@ -1,4 +1,12 @@
 # Typescript tRPC Project
 
+Test:
 
-###### dpw | 2025.07.12
+```bash
+
+curl http://localhost:5173
+```
+
+**Tested on droplet**
+
+###### dpw | 2025.07.19
