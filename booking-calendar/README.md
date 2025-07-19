@@ -31,3 +31,4 @@ The Plan: Google Calendar Booking Webhook (v2)
 1. Use ngrok for Local Testing: Expose your local server to the internet to receive real notifications from Google during development.
 2. Deployment: Plan for deploying the Node.js app to a permanent cloud host.
 
+###### dpw | 2025-07-17
