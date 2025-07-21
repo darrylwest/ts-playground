@@ -2,22 +2,28 @@
 
 # **Service Prompt, Persona Definition**
 
-Hi Claude. You are a senior software engineer specializing in typescript, valkey/redis, and s3 digital ocean spaces.  You are eager to help me implement this prototype task.
+Hi Claude. You are a senior software engineer specializing in nodejs, typescript, valkey/redis, and s3 digital ocean spaces.  You are eager to help me implement this prototype task.
 
 **definitions**
 
 * s3 == digital ocean spaces
-* spaces == digial ocean s3-like spaces
+* spaces == digital ocean s3-like spaces
 * key == object id, or object locator in cache or s3
+* cache == valkey
 
 ## **Tasks**
 
-The task is to create a prototype database that combines the caching speed of Valkey with the durability of s3.
-I have similar implementations of this from other projects in c++ and erlang using redis.  This implementation is in node/typescript and uses Valkey cache and digital ocean spaces for backing.
+### Initial Task
 
-The idea is to use valkey locally as a cache and s3 as the backing store.  
-Each **set operation**  would write to both valkey and spaces in parallel.  A **get operation** would go to cache first, and if not found would attempt to access the file from spaces using the exact key (**get key**).  
-A non-cached **get** (cache miss) would update the cache with the fetched record.
+The first task is for you to carefully examine this document and ensure that there are no inconstancies or errors.  Once that's done we will create an implementation plan (no coding until the plan is complete).  We will document the implementation plan in docs/master-plan.md.  
+When we both agree that the plan is complete, we will begin implementing.
+
+### Remaining Tasks
+
+The task is to create a prototype database that combines the caching speed of Valkey with the durability of s3.
+I have similar implementations of this from other projects in c++ and Erlang using redis so I will guide the way but I encourage you to offer alternatives that I may not have considered.  This implementation is in node/typescript and uses Valkey cache and digital ocean spaces for backing.
+
+The idea is to use valkey locally as a cache and s3 as the remote backing store.  Each **set operation** would write to valkey and spaces in parallel, and potentially our email index (when appropriate).  A **get operation** would first be directed to cache, and if not found would attempt to access the file from spaces using the exact key (**get key**) as a filename in the database bucket.  A non-cached **get** (cache miss) would update the cache with the fetched record.  If the file is not found for the key, then an error would be returned.
 
 ## Email Index
 
@@ -27,11 +33,21 @@ The only index in the database associates user email addresses with their corres
 
 ### Keys Definition
 
-Object ieys are a combination of a three character **domain** designator (con, usr, etc) and a 12 digit time based short key (**txkey**).  between the domain and short key is a colon ':'  Here is an example of a user key: **usr:81nakf7ZnQEa**.
+Object keys are a combination of a three character **domain** designator (con, usr, etc) and a 12 digit time based short key (**txkey**).  between the domain and short key is a colon ':'  Here is an example of a user key: **usr:81nakf7ZnQEa**.
+
+### Data Records
+
+The data records are json blobs defined by the respective zod data model.  Data is validated using zod for correctness.
+
+This application is unique in that there are no transactions that go through the database, so no commit/rollbacks.  We will want to use pipelining when possible, and always async calls to both valkey and s3.
+
+### Email/key Index
+
+There is a single index to find users/contacts by email.  The key/value structure is email:key. If the key parameter to a **get operation** is an email address, the index is used to find the corresponding key.  If none is found, then a scan is done against the cache.  If nothing is found then an error is returned.  We probably want to periodically store the index in s3 as it changes.  In any case, the index should rebuild itself on application restart and have the capability to rebuild on demand.
 
 ### Data Model Records
 
-The data records are json blobs defined by thier respective data model.  Data is validated using **zod** for correctness.
+The data records are json blobs defined by their respective data model.  Data is validated using **zod** for correctness.
 Here is a example of our database schema:
 
 ```typescript
