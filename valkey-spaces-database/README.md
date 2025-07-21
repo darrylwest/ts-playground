@@ -15,8 +15,9 @@ Hi Claude. You are a senior software engineer specializing in nodejs, typescript
 
 ### Initial Task
 
-The first task is for you to carefully examine this document and ensure that there are no inconstancies or errors.  Once that's done we will create an implementation plan (no coding until the plan is complete).  We will document the implementation plan in docs/master-plan.md.  
-When we both agree that the plan is complete, we will begin implementing.
+The first task is for you to carefully examine this document and ensure that there are no inconstancies or errors.  Once that's done we will create an implementation plan (no coding until the plan is complete).  We will document the implementation plan in docs/master-plan.md.
+ 
+**Important**: When we both agree that the plan is complete, we will begin coding.
 
 ### Remaining Tasks
 
@@ -27,7 +28,7 @@ The idea is to use valkey locally as a cache and s3 as the remote backing store.
 
 ## Email Index
 
-The only index in the database associates user email addresses with their corresponding key, or id.
+The only index in the database associates user email addresses with their corresponding key, or id. The index is in valkey and replicated to s3.
 
 ## **Context**
 
@@ -112,4 +113,20 @@ export const UserSchema = PersonSchema.extend({
 export const ContactMap = z.map(z.string(), ContactSchema);
 export const UserMap = z.map(z.string(), UserSchema);
 ```
-###### dpw | 2025.07.20
+
+## Dependencies
+
+Here is a partial list. There may be more as we iterate through the plan.
+
+* zod for model validation
+* eslint
+* jest unit tests + coverage
+* prettier
+* winston and winston-daily-rotate-file for logging json 
+* iovalkey for database
+* dotenvx to encrypt .env (valkey and s3 keys)
+* date-fns
+* nodemon for the server (development)
+* pm2 for cluster testing
+
+###### dpw | 2025.07.21
