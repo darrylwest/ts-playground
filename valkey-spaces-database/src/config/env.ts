@@ -24,6 +24,9 @@ const envSchema = z.object({
   RETRY_MAX_ATTEMPTS: z.coerce.number().default(3),
   RETRY_BASE_DELAY: z.coerce.number().default(1000),
   RETRY_MAX_DELAY: z.coerce.number().default(8000),
+  
+  // TxKey Configuration
+  TXKEY_EXECUTABLE_PATH: z.string().default('/usr/local/bin/txkey'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
