@@ -26,10 +26,10 @@ describe('Retry Utilities', () => {
 
   describe('retryWithExponentialBackoff', () => {
     it('should return result on first success', async () => {
-      const mockOperation = jest.fn().mockResolvedValue('success');
+      const mockOperation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation as () => Promise<string>,
+        mockOperation,
         'test-operation'
       );
       
@@ -38,13 +38,13 @@ describe('Retry Utilities', () => {
     });
 
     it('should retry on failure and eventually succeed', async () => {
-      const mockOperation = jest.fn()
+      const mockOperation = jest.fn<() => Promise<string>>()
         .mockRejectedValueOnce(new Error('First failure'))
         .mockRejectedValueOnce(new Error('Second failure'))
         .mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation as () => Promise<string>,
+        mockOperation,
         'test-operation'
       );
       
@@ -53,11 +53,11 @@ describe('Retry Utilities', () => {
     });
 
     it('should fail after max attempts', async () => {
-      const mockOperation = jest.fn().mockRejectedValue(new Error('Persistent failure'));
+      const mockOperation = jest.fn<() => Promise<string>>().mockRejectedValue(new Error('Persistent failure'));
       
       await expect(
         retryWithExponentialBackoff(
-          mockOperation as () => Promise<string>,
+          mockOperation,
           'test-operation',
           { maxAttempts: 2 }
         )
@@ -67,12 +67,12 @@ describe('Retry Utilities', () => {
     });
 
     it('should respect custom retry options', async () => {
-      const mockOperation = jest.fn()
+      const mockOperation = jest.fn<() => Promise<string>>()
         .mockRejectedValueOnce(new Error('Failure'))
         .mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation as () => Promise<string>,
+        mockOperation,
         'test-operation',
         {
           maxAttempts: 5,
@@ -87,11 +87,11 @@ describe('Retry Utilities', () => {
     });
 
     it('should handle non-Error rejections', async () => {
-      const mockOperation = jest.fn().mockRejectedValue('string error');
+      const mockOperation = jest.fn<() => Promise<string>>().mockRejectedValue('string error');
       
       await expect(
         retryWithExponentialBackoff(
-          mockOperation as () => Promise<string>,
+          mockOperation,
           'test-operation',
           { maxAttempts: 1 }
         )
@@ -99,7 +99,7 @@ describe('Retry Utilities', () => {
     });
 
     it('should apply exponential backoff delays', async () => {
-      const mockOperation = jest.fn()
+      const mockOperation = jest.fn<() => Promise<string>>()
         .mockRejectedValueOnce(new Error('First failure'))
         .mockRejectedValueOnce(new Error('Second failure'))
         .mockResolvedValue('success');
@@ -107,7 +107,7 @@ describe('Retry Utilities', () => {
       const startTime = Date.now();
       
       await retryWithExponentialBackoff(
-        mockOperation as () => Promise<string>,
+        mockOperation,
         'test-operation',
         {
           baseDelay: 100,
@@ -124,12 +124,12 @@ describe('Retry Utilities', () => {
     });
 
     it('should respect maxDelay', async () => {
-      const mockOperation = jest.fn()
+      const mockOperation = jest.fn<() => Promise<string>>()
         .mockRejectedValueOnce(new Error('Failure'))
         .mockResolvedValue('success');
 
       await retryWithExponentialBackoff(
-        mockOperation as () => Promise<string>,
+        mockOperation,
         'test-operation',
         {
           baseDelay: 1000,

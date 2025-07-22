@@ -16,13 +16,13 @@ jest.mock('child_process', () => ({
   exec: jest.fn(),
 }));
 
-// Mock util promisify
+// Mock util promisify  
 jest.mock('util', () => ({
-  promisify: jest.fn((_fn) => {
-    return jest.fn().mockResolvedValue({
+  promisify: jest.fn(() => {
+    return jest.fn(() => Promise.resolve({
       stdout: 'abc123DEF456', // Mock 12-character txkey
       stderr: '',
-    });
+    }));
   }),
 }));
 

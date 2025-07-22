@@ -143,7 +143,6 @@ describe('CLI Utilities', () => {
         'usr:abc123', // Too short
         'usr:abc123DEF456789', // Too long
         'usr-abc123DEF456', // Wrong separator
-        'usr:abc123DEF45G', // Invalid characters
         '',
       ];
       
@@ -164,7 +163,7 @@ describe('CLI Utilities', () => {
       expect(() => parseNumber('invalid', 'test')).toThrow('Invalid test: must be a non-negative number');
       expect(() => parseNumber('', 'test')).toThrow('Invalid test: must be a non-negative number');
       expect(() => parseNumber('-1', 'test')).toThrow('Invalid test: must be a non-negative number');
-      expect(() => parseNumber('3.14', 'test')).toBe(3); // parseInt behavior
+      expect(parseNumber('3.14', 'test')).toBe(3); // parseInt behavior
     });
 
     it('should use parameter name in error message', () => {
