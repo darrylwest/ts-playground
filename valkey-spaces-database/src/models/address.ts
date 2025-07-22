@@ -8,9 +8,7 @@ export const AddressSchema = z.object({
   state: z.string(),
   zip: z.string(),
   // latitude and longitude as a tuple, both optional
-  latlng: z
-    .tuple([z.number(), z.number()])
-    .optional(), // [latitude, longitude]
+  latlng: z.tuple([z.number(), z.number()]).optional(), // [latitude, longitude]
 });
 
 export type Address = z.infer<typeof AddressSchema>;

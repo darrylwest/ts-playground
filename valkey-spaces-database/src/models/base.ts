@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export enum BaseStatus {
   New = 'new',
-  Pending = 'pending', 
+  Pending = 'pending',
   Active = 'active',
   Inactive = 'inactive',
   Verified = 'verified',

@@ -1,6 +1,5 @@
 import { exec, ExecException } from 'child_process';
 import { promisify } from 'util';
-import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
 // Promisify exec for easier async/await usage
@@ -13,7 +12,7 @@ const getTxKeyPath = (): string => {
 
 /**
  * Generates a 12-character time-based short key by invoking external 'txkey' executable.
- * 
+ *
  * @param args Optional array of arguments to pass to txkey
  * @returns Promise resolving to 12-character txkey string
  * @throws Error if executable fails or returns no output
@@ -26,9 +25,9 @@ export async function createTxKey(args: string[] = []): Promise<string> {
     const { stdout, stderr } = await execPromise(command);
 
     if (stderr) {
-      logger.warn('txkey executable produced stderr', { 
+      logger.warn('txkey executable produced stderr', {
         stderr: stderr.trim(),
-        command 
+        command,
       });
     }
 
@@ -40,24 +39,25 @@ export async function createTxKey(args: string[] = []): Promise<string> {
 
     logger.debug('Generated txkey', { key, args });
     return key;
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     const execError = error as ExecException;
     logger.error('Failed to generate txkey', {
       message: execError.message,
       code: execError.code,
       signal: execError.signal,
       stderr: execError.stderr?.trim(),
-      command
+      command,
     });
 
-    throw new Error(`Failed to generate key using txkey executable: ${execError.message}`);
+    throw new Error(
+      `Failed to generate key using txkey executable: ${execError.message}`
+    );
   }
 }
 
 /**
  * Generates a 16-character route key in domain:txkey format.
- * 
+ *
  * @param domain Three character domain prefix (e.g., 'usr', 'con')
  * @returns Promise resolving to 16-character route key string
  */
@@ -68,14 +68,14 @@ export async function createRouteKey(domain: string): Promise<string> {
 
   const txKey = await createTxKey();
   const routeKey = `${domain}:${txKey}`;
-  
+
   logger.debug('Generated route key', { domain, txKey, routeKey });
   return routeKey;
 }
 
 /**
  * Validates that a key matches the expected route key format (domain:txkey).
- * 
+ *
  * @param key The key to validate
  * @returns True if key is valid route key format
  */
@@ -85,7 +85,7 @@ export function isValidRouteKey(key: string): boolean {
 
 /**
  * Extracts the domain from a route key.
- * 
+ *
  * @param key Route key in domain:txkey format
  * @returns Domain portion of the key
  * @throws Error if key is invalid format
@@ -99,8 +99,8 @@ export function extractDomain(key: string): string {
 
 /**
  * Extracts the txkey from a route key.
- * 
- * @param key Route key in domain:txkey format  
+ *
+ * @param key Route key in domain:txkey format
  * @returns Txkey portion of the key
  * @throws Error if key is invalid format
  */

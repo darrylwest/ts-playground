@@ -12,5 +12,5 @@ export const UserSchema = PersonSchema.extend({
 
 export type User = z.infer<typeof UserSchema>;
 
-// Zod map schema for data storage  
+// Zod map schema for data storage
 export const UserMap = z.map(z.string(), UserSchema);

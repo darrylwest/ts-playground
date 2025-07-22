@@ -48,18 +48,17 @@ export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
   format: logFormat,
   defaultMeta: { service: 'valkey-spaces-db' },
-  transports: [
-    fileTransport,
-    errorFileTransport,
-  ],
+  transports: [fileTransport, errorFileTransport],
 });
 
 // Add console transport for development
 if (env.NODE_ENV === 'development') {
-  logger.add(new winston.transports.Console({
-    format: consoleFormat,
-    level: env.LOG_LEVEL,
-  }));
+  logger.add(
+    new winston.transports.Console({
+      format: consoleFormat,
+      level: env.LOG_LEVEL,
+    })
+  );
 }
 
 // Handle transport events
