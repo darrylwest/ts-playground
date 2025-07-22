@@ -11,6 +11,10 @@ Hi Claude. You are a senior software engineer specializing in nodejs, typescript
 * key == object id, or object locator in cache or s3
 * cache == valkey
 
+## **Product Description**
+
+This is a demonstration/proof-of-concept project that if successful will be used as a basis for larger projects.  It is a backend-only project that 1) defines data models, 2) creates test data, 3) provides a CLI that enables CRUD and search capabilities.  Search is limited to email address to locate a user. 
+
 ## **Tasks**
 
 ### Initial Task
@@ -129,4 +133,4 @@ Here is a partial list. There may be more as we iterate through the plan.
 * nodemon for the server (development)
 * pm2 for cluster testing
 
-###### dpw | 2025.07.21
+###### dpw | 2025.07.22
