@@ -5,7 +5,7 @@
  * They can be skipped in CI by setting SKIP_INTEGRATION_TESTS=true
  */
 
-import { jest } from '@jest/globals';
+// Jest and testing utilities
 import {
   createUser,
   getUserByEmail,
@@ -20,8 +20,8 @@ import {
   checkValkeyHealth,
   checkS3Health,
   closeConnections,
-} from '../../src/database/index.js';
-import { BaseStatus } from '../../src/models/index.js';
+} from '../../src/database/index';
+import { BaseStatus } from '../../src/models/index';
 
 // Skip integration tests if environment variable is set
 const skipIntegrationTests = process.env.SKIP_INTEGRATION_TESTS === 'true';
@@ -45,12 +45,12 @@ describe('Database Integration Tests', () => {
   });
 
   describe('Health Checks', () => {
-    it.skipIf(skipIntegrationTests)('should check Valkey health', async () => {
+    (skipIntegrationTests ? it.skip : it)('should check Valkey health', async () => {
       const isHealthy = await checkValkeyHealth();
       expect(typeof isHealthy).toBe('boolean');
     });
 
-    it.skipIf(skipIntegrationTests)('should check S3 health', async () => {
+    (skipIntegrationTests ? it.skip : it)('should check S3 health', async () => {
       const isHealthy = await checkS3Health();
       expect(typeof isHealthy).toBe('boolean');
     });
@@ -60,7 +60,7 @@ describe('Database Integration Tests', () => {
     const testEmail = `test-${Date.now()}@example.com`;
     let testUserKey: string;
 
-    it.skipIf(skipIntegrationTests)('should create a new user', async () => {
+    (skipIntegrationTests ? it.skip : it)('should create a new user', async () => {
       const userData = {
         first_name: 'Integration',
         last_name: 'Test',
@@ -81,7 +81,7 @@ describe('Database Integration Tests', () => {
       testUserKey = user.key;
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should find user by email', async () => {
+    (skipIntegrationTests ? it.skip : it)('should find user by email', async () => {
       const user = await getUserByEmail(testEmail);
 
       expect(user).toBeDefined();
@@ -89,7 +89,7 @@ describe('Database Integration Tests', () => {
       expect(user?.key).toBe(testUserKey);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should get user by key', async () => {
+    (skipIntegrationTests ? it.skip : it)('should get user by key', async () => {
       const user = await getUserByKey(testUserKey);
 
       expect(user).toBeDefined();
@@ -97,7 +97,7 @@ describe('Database Integration Tests', () => {
       expect(user?.key).toBe(testUserKey);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should update user', async () => {
+    (skipIntegrationTests ? it.skip : it)('should update user', async () => {
       const updates = {
         status: BaseStatus.Active,
         first_name: 'Updated',
@@ -113,20 +113,20 @@ describe('Database Integration Tests', () => {
       expect(updatedUser.lastUpdated).toBeGreaterThan(updatedUser.dateCreated);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should handle optimistic locking', async () => {
+    (skipIntegrationTests ? it.skip : it)('should handle optimistic locking', async () => {
       // This should fail because we expect version 0 but it's now 1
       await expect(
         updateUser(testUserKey, { first_name: 'ShouldFail' }, 0)
       ).rejects.toThrow('Version mismatch');
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should get user count', async () => {
+    (skipIntegrationTests ? it.skip : it)('should get user count', async () => {
       const count = await getUserCount();
       expect(typeof count).toBe('number');
       expect(count).toBeGreaterThan(0);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should list users with pagination', async () => {
+    (skipIntegrationTests ? it.skip : it)('should list users with pagination', async () => {
       const result = await listUsers(0, 10);
 
       expect(result).toBeDefined();
@@ -140,13 +140,13 @@ describe('Database Integration Tests', () => {
       expect(foundUser).toBeDefined();
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should prevent duplicate email addresses', async () => {
+    (skipIntegrationTests ? it.skip : it)('should prevent duplicate email addresses', async () => {
       await expect(
         createUser(testEmail, { ip_address: '127.0.0.1', roles: 'user' })
       ).rejects.toThrow(`User with email ${testEmail} already exists`);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should delete user', async () => {
+    (skipIntegrationTests ? it.skip : it)('should delete user', async () => {
       const deleted = await deleteUser(testUserKey);
       expect(deleted).toBe(true);
 
@@ -163,14 +163,14 @@ describe('Database Integration Tests', () => {
     const testEmail = `index-test-${Date.now()}@example.com`;
     const testKey = `usr:${Math.random().toString(36).substring(2, 14)}`;
 
-    it.skipIf(skipIntegrationTests)('should add email mapping', async () => {
+    (skipIntegrationTests ? it.skip : it)('should add email mapping', async () => {
       await addEmailMapping(testEmail, testKey);
       
       const retrievedKey = await getKeyByEmail(testEmail);
       expect(retrievedKey).toBe(testKey);
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should verify email index consistency', async () => {
+    (skipIntegrationTests ? it.skip : it)('should verify email index consistency', async () => {
       const verification = await verifyEmailIndex();
 
       expect(verification).toBeDefined();
@@ -184,7 +184,7 @@ describe('Database Integration Tests', () => {
       if (!skipIntegrationTests) {
         try {
           // Clean up test data
-          const { removeEmailMapping } = await import('../../src/database/index.js');
+          const { removeEmailMapping } = await import('../../src/database/index');
           await removeEmailMapping(testEmail);
         } catch (error) {
           console.warn('Error cleaning up test email mapping:', error);
@@ -194,17 +194,17 @@ describe('Database Integration Tests', () => {
   });
 
   describe('Error Handling', () => {
-    it.skipIf(skipIntegrationTests)('should handle non-existent user gracefully', async () => {
+    (skipIntegrationTests ? it.skip : it)('should handle non-existent user gracefully', async () => {
       const user = await getUserByKey('usr:nonexistent12');
       expect(user).toBeNull();
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should handle non-existent email gracefully', async () => {
+    (skipIntegrationTests ? it.skip : it)('should handle non-existent email gracefully', async () => {
       const user = await getUserByEmail('nonexistent@example.com');
       expect(user).toBeNull();
     }, 10000);
 
-    it.skipIf(skipIntegrationTests)('should handle invalid user data', async () => {
+    (skipIntegrationTests ? it.skip : it)('should handle invalid user data', async () => {
       await expect(
         createUser('invalid-email', { ip_address: '127.0.0.1', roles: 'user' })
       ).rejects.toThrow();

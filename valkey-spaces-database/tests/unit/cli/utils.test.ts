@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+// Jest utilities imported automatically in test environment
 import {
   createSuccessResponse,
   createErrorResponse,
@@ -6,7 +6,7 @@ import {
   isValidEmail,
   isValidUserKey,
   parseNumber,
-} from '../../../src/cli/utils.js';
+} from '../../../src/cli/utils';
 
 describe('CLI Utilities', () => {
   describe('createSuccessResponse', () => {

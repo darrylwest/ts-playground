@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { retryWithExponentialBackoff } from '../../../src/database/retry.js';
+import { retryWithExponentialBackoff } from '../../../src/database/retry';
 
 // Mock the logger
 jest.mock('../../../src/config/logger.js', () => ({
@@ -29,7 +29,7 @@ describe('Retry Utilities', () => {
       const mockOperation = jest.fn().mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation,
+        mockOperation as () => Promise<string>,
         'test-operation'
       );
       
@@ -44,7 +44,7 @@ describe('Retry Utilities', () => {
         .mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation,
+        mockOperation as () => Promise<string>,
         'test-operation'
       );
       
@@ -57,7 +57,7 @@ describe('Retry Utilities', () => {
       
       await expect(
         retryWithExponentialBackoff(
-          mockOperation,
+          mockOperation as () => Promise<string>,
           'test-operation',
           { maxAttempts: 2 }
         )
@@ -72,7 +72,7 @@ describe('Retry Utilities', () => {
         .mockResolvedValue('success');
       
       const result = await retryWithExponentialBackoff(
-        mockOperation,
+        mockOperation as () => Promise<string>,
         'test-operation',
         {
           maxAttempts: 5,
@@ -91,7 +91,7 @@ describe('Retry Utilities', () => {
       
       await expect(
         retryWithExponentialBackoff(
-          mockOperation,
+          mockOperation as () => Promise<string>,
           'test-operation',
           { maxAttempts: 1 }
         )
@@ -107,7 +107,7 @@ describe('Retry Utilities', () => {
       const startTime = Date.now();
       
       await retryWithExponentialBackoff(
-        mockOperation,
+        mockOperation as () => Promise<string>,
         'test-operation',
         {
           baseDelay: 100,
@@ -129,7 +129,7 @@ describe('Retry Utilities', () => {
         .mockResolvedValue('success');
 
       await retryWithExponentialBackoff(
-        mockOperation,
+        mockOperation as () => Promise<string>,
         'test-operation',
         {
           baseDelay: 1000,

@@ -5,7 +5,7 @@ import {
   UserSchema, 
   ContactSchema, 
   AddressSchema 
-} from '../../../src/models/index.js';
+} from '../../../src/models/index';
 
 describe('Data Models', () => {
   describe('BaseStatus Enum', () => {
