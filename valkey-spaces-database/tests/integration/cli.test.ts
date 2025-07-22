@@ -1,0 +1,267 @@
+/**
+ * CLI Command Integration Tests
+ * 
+ * Tests CLI commands end-to-end by executing the actual CLI binary
+ */
+
+import { jest } from '@jest/globals';
+import { spawn } from 'child_process';
+import { promisify } from 'util';
+
+const skipCliTests = process.env.SKIP_CLI_TESTS === 'true';
+
+// Helper to execute CLI commands
+async function execCliCommand(command: string, args: string[] = []): Promise<{
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}> {
+  return new Promise((resolve) => {
+    const child = spawn('npx', ['dotenvx', 'run', '--', 'node', 'dist/cli/index.js', command, ...args], {
+      stdio: 'pipe',
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout?.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr?.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    child.on('close', (code) => {
+      resolve({
+        stdout,
+        stderr,
+        exitCode: code || 0,
+      });
+    });
+
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      child.kill();
+      resolve({
+        stdout,
+        stderr,
+        exitCode: 1,
+      });
+    }, 30000);
+  });
+}
+
+// Helper to parse JSON response
+function parseJsonResponse(stdout: string): any {
+  const lines = stdout.trim().split('\n');
+  const jsonLine = lines.find(line => line.startsWith('{'));
+  return jsonLine ? JSON.parse(jsonLine) : null;
+}
+
+describe('CLI Command Integration Tests', () => {
+  beforeAll(() => {
+    if (skipCliTests) {
+      console.log('Skipping CLI tests (SKIP_CLI_TESTS=true)');
+    }
+  });
+
+  describe('Help and Usage', () => {
+    it.skipIf(skipCliTests)('should show help', async () => {
+      const result = await execCliCommand('--help');
+      
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Valkey Spaces Database CLI');
+      expect(result.stdout).toContain('USER MANAGEMENT COMMANDS');
+      expect(result.stdout).toContain('ADMIN COMMANDS');
+    });
+
+    it.skipIf(skipCliTests)('should show usage for invalid commands', async () => {
+      const result = await execCliCommand('invalid-command');
+      
+      expect(result.exitCode).toBe(1);
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Unknown command');
+    });
+  });
+
+  describe('Admin Commands', () => {
+    it.skipIf(skipCliTests)('should execute health-check', async () => {
+      const result = await execCliCommand('health-check');
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data).toHaveProperty('valkey');
+      expect(response?.data).toHaveProperty('s3');
+      expect(response?.data).toHaveProperty('overall');
+    });
+
+    it.skipIf(skipCliTests)('should execute get-user-count', async () => {
+      const result = await execCliCommand('get-user-count');
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data).toHaveProperty('count');
+      expect(typeof response?.data?.count).toBe('number');
+    });
+
+    it.skipIf(skipCliTests)('should execute verify-email-index', async () => {
+      const result = await execCliCommand('verify-email-index');
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data).toHaveProperty('consistent');
+      expect(response?.data).toHaveProperty('valkeyEntries');
+      expect(response?.data).toHaveProperty('s3Entries');
+    });
+  });
+
+  describe('User Commands', () => {
+    const testEmail = `cli-test-${Date.now()}@example.com`;
+    let testUserKey: string;
+
+    it.skipIf(skipCliTests)('should show usage for create-user without email', async () => {
+      const result = await execCliCommand('create-user');
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Email address is required');
+    });
+
+    it.skipIf(skipCliTests)('should create a new user', async () => {
+      const result = await execCliCommand('create-user', [testEmail]);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data).toHaveProperty('key');
+      expect(response?.data?.email).toBe(testEmail);
+      expect(response?.data?.key).toMatch(/^usr:[a-zA-Z0-9]{12}$/);
+      
+      testUserKey = response.data.key;
+    });
+
+    it.skipIf(skipCliTests)('should find user by email', async () => {
+      const result = await execCliCommand('find-user', [testEmail]);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data?.email).toBe(testEmail);
+      expect(response?.data?.key).toBe(testUserKey);
+    });
+
+    it.skipIf(skipCliTests)('should get user by key', async () => {
+      const result = await execCliCommand('get-user', [testUserKey]);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data?.email).toBe(testEmail);
+      expect(response?.data?.key).toBe(testUserKey);
+    });
+
+    it.skipIf(skipCliTests)('should update user status', async () => {
+      const result = await execCliCommand('update-user', [testUserKey, 'status=active']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data?.status).toBe('active');
+      expect(response?.data?.version).toBe(1);
+    });
+
+    it.skipIf(skipCliTests)('should update multiple user fields', async () => {
+      const result = await execCliCommand('update-user', [
+        testUserKey, 
+        'first_name=CLI',
+        'last_name=Test'
+      ]);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data?.first_name).toBe('CLI');
+      expect(response?.data?.last_name).toBe('Test');
+      expect(response?.data?.version).toBe(2);
+    });
+
+    it.skipIf(skipCliTests)('should list users', async () => {
+      const result = await execCliCommand('list-users', ['0', '10']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(true);
+      expect(response?.data).toHaveProperty('users');
+      expect(response?.data).toHaveProperty('total');
+      expect(response?.data?.offset).toBe(0);
+      expect(response?.data?.limit).toBe(10);
+      expect(Array.isArray(response?.data?.users)).toBe(true);
+      
+      // Our test user should be in the results
+      const foundUser = response?.data?.users?.find((u: any) => u.email === testEmail);
+      expect(foundUser).toBeDefined();
+    });
+
+    it.skipIf(skipCliTests)('should prevent duplicate user creation', async () => {
+      const result = await execCliCommand('create-user', [testEmail]);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('already exists');
+    });
+
+    it.skipIf(skipCliTests)('should handle invalid email format', async () => {
+      const result = await execCliCommand('create-user', ['invalid-email']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Invalid email address format');
+    });
+
+    it.skipIf(skipCliTests)('should handle invalid user key format', async () => {
+      const result = await execCliCommand('get-user', ['invalid-key']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Invalid user key format');
+    });
+
+    it.skipIf(skipCliTests)('should handle non-existent user', async () => {
+      const result = await execCliCommand('find-user', ['nonexistent@example.com']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('User not found');
+    });
+  });
+
+  describe('Validation and Error Handling', () => {
+    it.skipIf(skipCliTests)('should validate list-users parameters', async () => {
+      const result = await execCliCommand('list-users', ['invalid', '10']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('must be a non-negative number');
+    });
+
+    it.skipIf(skipCliTests)('should enforce list-users limit', async () => {
+      const result = await execCliCommand('list-users', ['0', '150']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('cannot exceed 100');
+    });
+
+    it.skipIf(skipCliTests)('should validate update-user field names', async () => {
+      const result = await execCliCommand('update-user', ['usr:abc123DEF456', 'invalid_field=value']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Unknown field');
+    });
+
+    it.skipIf(skipCliTests)('should validate status values', async () => {
+      const result = await execCliCommand('update-user', ['usr:abc123DEF456', 'status=invalid_status']);
+      
+      const response = parseJsonResponse(result.stdout);
+      expect(response?.success).toBe(false);
+      expect(response?.error).toContain('Invalid status');
+    });
+  });
+});
