@@ -25,7 +25,7 @@ The first task is for you to carefully examine this document and ensure that the
 
 ### Remaining Tasks
 
-The task is to create a prototype database that combines the caching speed of Valkey with the durability of s3.
+The task is to create a prototype **database that combines the caching speed of Valkey with the durability of s3**.
 I have similar implementations of this from other projects in c++ and Erlang using redis so I will guide the way but I encourage you to offer alternatives that I may not have considered.  This implementation is in node/typescript and uses Valkey cache and digital ocean spaces for backing.
 
 The idea is to use valkey locally as a cache and s3 as the remote backing store.  Each **set operation** would write to valkey and spaces in parallel, and potentially our email index (when appropriate).  A **get operation** would first be directed to cache, and if not found would attempt to access the file from spaces using the exact key (**get key**) as a filename in the database bucket.  A non-cached **get** (cache miss) would update the cache with the fetched record.  If the file is not found for the key, then an error would be returned.
@@ -117,6 +117,18 @@ export const UserSchema = PersonSchema.extend({
 export const ContactMap = z.map(z.string(), ContactSchema);
 export const UserMap = z.map(z.string(), UserSchema);
 ```
+
+## Proposed CLI
+
+CLI commands will use package.json and **npm run** to make simple calls. All responses are in json format
+
+* `create-user 'henry.jones@test.com'` : creates a new user with the given email address with random data for remaining fields; returns and error if the user is currently in the database
+* `find-user 'henry.jones@test.com'` : attempts to find the user given the email address, returns and error if not found
+* `get-user usr:81q3XaaUZzF5` : attempts to find/return the user, else returns and error
+* `update-user usr:81q3XaaUZzF5 status=active` : finds the user and updates the status to active
+* `list-users 0 20` : lists the first 20 users where 0=offset, 20=limit
+* `get-user-count` : returns the total number of users
+
 
 ## Dependencies
 
