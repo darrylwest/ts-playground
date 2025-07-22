@@ -146,31 +146,42 @@ export async function checkS3Health(): Promise<boolean> {
  * Gracefully close all database connections
  */
 export async function closeConnections(): Promise<void> {
-  logger.info('Closing database connections');
+  logger.info('[CONNECTIONS] Starting closeConnections');
 
   const promises: Promise<void>[] = [];
 
   if (valkeyClient) {
+    logger.info('[CONNECTIONS] Valkey client exists, status:', { status: valkeyClient.status });
     promises.push(
       (async () => {
         try {
+          logger.info('[CONNECTIONS] Calling valkeyClient.disconnect()');
           await valkeyClient!.disconnect();
+          logger.info('[CONNECTIONS] Valkey disconnect completed');
         } catch (error) {
-          logger.error('Error closing Valkey connection', {
+          logger.error('[CONNECTIONS] Error during Valkey disconnect', {
             error: error instanceof Error ? error.message : String(error),
           });
         }
       })()
     );
+    logger.info('[CONNECTIONS] Setting valkeyClient to null');
     valkeyClient = null;
+  } else {
+    logger.info('[CONNECTIONS] No Valkey client to close');
   }
 
   // S3 client doesn't need explicit closing
   if (s3Client) {
+    logger.info('[CONNECTIONS] Destroying S3 client');
     s3Client.destroy();
     s3Client = null;
+    logger.info('[CONNECTIONS] S3 client destroyed');
+  } else {
+    logger.info('[CONNECTIONS] No S3 client to destroy');
   }
 
+  logger.info('[CONNECTIONS] Waiting for all disconnect promises');
   await Promise.all(promises);
-  logger.info('Database connections closed');
+  logger.info('[CONNECTIONS] All database connections closed successfully');
 }

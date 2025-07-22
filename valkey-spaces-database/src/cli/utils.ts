@@ -89,21 +89,54 @@ export async function handleCommand(
   handler: () => Promise<CLIResponse>
 ): Promise<void> {
   try {
-    logger.info(`Executing CLI command: ${commandName}`);
+    logger.info(`[CLI] Starting command execution: ${commandName}`);
     const response = await handler();
+    logger.info(`[CLI] Command handler completed: ${commandName}`, { success: response.success });
     
     if (response.success) {
-      logger.info(`CLI command completed successfully: ${commandName}`);
+      logger.info(`[CLI] Command succeeded: ${commandName}`);
     } else {
-      logger.warn(`CLI command failed: ${commandName}`, { error: response.error });
+      logger.warn(`[CLI] Command failed: ${commandName}`, { error: response.error });
     }
     
+    logger.info(`[CLI] Outputting response for: ${commandName}`);
     outputResponse(response);
+    logger.info(`[CLI] Response output completed for: ${commandName}`);
+
+    // Close database connections after command completion
+    logger.info(`[CLI] Starting connection cleanup for: ${commandName}`);
+    try {
+      const { closeConnections } = await import('../database/index.js');
+      logger.info(`[CLI] Calling closeConnections for: ${commandName}`);
+      await closeConnections();
+      logger.info(`[CLI] Database connections closed successfully for: ${commandName}`);
+    } catch (closeError) {
+      logger.error(`[CLI] Error closing connections for: ${commandName}`, {
+        error: closeError instanceof Error ? closeError.message : String(closeError)
+      });
+    }
+    
+    logger.info(`[CLI] Command execution fully completed: ${commandName}`);
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`CLI command error: ${commandName}`, { error: errorMessage });
+    logger.error(`[CLI] Command execution error: ${commandName}`, { error: errorMessage });
     
     outputResponse(createErrorResponse(errorMessage));
+    
+    // Try to close connections even on error
+    logger.info(`[CLI] Attempting emergency connection cleanup for: ${commandName}`);
+    try {
+      const { closeConnections } = await import('../database/index.js');
+      await closeConnections();
+      logger.info(`[CLI] Emergency connection cleanup completed for: ${commandName}`);
+    } catch (closeError) {
+      logger.error(`[CLI] Emergency connection cleanup failed for: ${commandName}`, {
+        error: closeError instanceof Error ? closeError.message : String(closeError)
+      });
+    }
+    
+    logger.info(`[CLI] Exiting with error code 1 for: ${commandName}`);
     process.exit(1);
   }
 }

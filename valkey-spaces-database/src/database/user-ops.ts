@@ -302,16 +302,19 @@ export async function listUsers(
  * Get total user count
  */
 export async function getUserCount(): Promise<number> {
-  logger.debug('Getting user count');
+  logger.info('[USER-OPS] Starting getUserCount');
 
   try {
+    logger.info('[USER-OPS] Calling getAllEmailMappings');
     const emailMappings = await getAllEmailMappings();
+    logger.info('[USER-OPS] getAllEmailMappings completed, processing results');
+    
     const count = Object.keys(emailMappings).length;
-
-    logger.debug('User count retrieved', { count });
+    logger.info('[USER-OPS] User count calculated', { count });
+    
     return count;
   } catch (error) {
-    logger.error('Failed to get user count', {
+    logger.error('[USER-OPS] Failed to get user count', {
       error: error instanceof Error ? error.message : String(error),
     });
     throw error;
