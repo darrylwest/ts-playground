@@ -72,11 +72,11 @@ export enum BaseStatus {
 }
 
 export const BaseSchema = z.object({
-  key: z.string().length(16), // use createRouteKey() to create a 16 char short key
+  key: z.string().length(16), // use createRouteKey() to create a 16 char key (domain:txkey format)
   dateCreated: z.number(),   // Date.now()
   lastUpdated: z.number(),   // Date.now()
   version: z.number().gte(0),       // for optimistic locking
-  status: z.enum(BaseStatus), // Corrected to z.nativeEnum
+  status: z.nativeEnum(BaseStatus),
 });
 
 export const PersonSchema = BaseSchema.extend({
@@ -122,9 +122,9 @@ export const UserMap = z.map(z.string(), UserSchema);
 
 CLI commands will use package.json and **npm run** to make simple calls. All responses are in json format
 
-* `create-user 'henry.jones@test.com'` : creates a new user with the given email address with random data for remaining fields; returns and error if the user is currently in the database
-* `find-user 'henry.jones@test.com'` : attempts to find the user given the email address, returns and error if not found
-* `get-user usr:81q3XaaUZzF5` : attempts to find/return the user, else returns and error
+* `create-user 'henry.jones@test.com'` : creates a new user with the given email address with random data for remaining fields; returns an error if the user is currently in the database
+* `find-user 'henry.jones@test.com'` : attempts to find the user given the email address, returns an error if not found
+* `get-user usr:81q3XaaUZzF5` : attempts to find/return the user, else returns an error
 * `update-user usr:81q3XaaUZzF5 status=active` : finds the user and updates the status to active
 * `list-users 0 20` : lists the first 20 users where 0=offset, 20=limit
 * `get-user-count` : returns the total number of users
