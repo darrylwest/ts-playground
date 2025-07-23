@@ -18,6 +18,11 @@ async function execCliCommand(command: string, args: string[] = []): Promise<{
   return new Promise((resolve) => {
     const child = spawn('npx', ['dotenvx', 'run', '--', 'node', 'dist/cli/index.js', command, ...args], {
       stdio: 'pipe',
+      env: {
+        ...process.env,
+        LOG_LEVEL: 'error', // Suppress most logging during tests
+        NODE_ENV: 'test'    // Ensure we're in test mode
+      }
     });
 
     let stdout = '';
@@ -53,9 +58,67 @@ async function execCliCommand(command: string, args: string[] = []): Promise<{
 
 // Helper to parse JSON response
 function parseJsonResponse(stdout: string): any {
-  const lines = stdout.trim().split('\n');
-  const jsonLine = lines.find(line => line.startsWith('{'));
-  return jsonLine ? JSON.parse(jsonLine) : null;
+  try {
+    // Remove ANSI color codes first
+    const cleanOutput = stdout.replace(/\x1b\[[0-9;]*m/g, '');
+    
+    // Split into lines and filter out dotenvx messages and empty lines
+    const lines = cleanOutput
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .filter(line => !line.includes('[dotenvx@') && !line.includes('injecting env'));
+    
+    // Find JSON objects and parse them
+    const jsonObjects = [];
+    let i = 0;
+    
+    while (i < lines.length) {
+      if (lines[i].startsWith('{')) {
+        let jsonString = '';
+        let braceCount = 0;
+        let j = i;
+        
+        // Collect all lines that are part of this JSON object
+        while (j < lines.length) {
+          jsonString += lines[j];
+          
+          for (const char of lines[j]) {
+            if (char === '{') braceCount++;
+            if (char === '}') braceCount--;
+          }
+          
+          j++;
+          if (braceCount === 0) break;
+        }
+        
+        try {
+          const parsed = JSON.parse(jsonString);
+          jsonObjects.push(parsed);
+        } catch (parseError) {
+          // Skip invalid JSON
+        }
+        
+        i = j;
+      } else {
+        i++;
+      }
+    }
+    
+    if (jsonObjects.length === 0) {
+      console.log('No valid JSON found in cleaned output.');
+      console.log('Original stdout:', stdout);
+      console.log('Cleaned lines:', lines);
+      return null;
+    }
+    
+    // Return the last JSON object (most relevant for final command result)
+    return jsonObjects[jsonObjects.length - 1];
+  } catch (error) {
+    console.log('JSON parse error:', error);
+    console.log('Raw stdout:', stdout);
+    return null;
+  }
 }
 
 describe('CLI Command Integration Tests', () => {

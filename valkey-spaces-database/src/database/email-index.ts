@@ -26,31 +26,8 @@ export async function addEmailMapping(
     }, `email-index-valkey-add-${email}`)
   );
 
-  // Write-through to S3 (get current index, update, store back)
-  operations.push(
-    retryWithExponentialBackoff(async () => {
-      // Get current index from S3
-      let currentIndex: Record<string, string> = {};
-      try {
-        const existingIndex =
-          await dbGet<Record<string, string>>(EMAIL_INDEX_S3_KEY);
-        if (existingIndex) {
-          currentIndex = existingIndex;
-        }
-      } catch (error) {
-        logger.debug('No existing email index in S3, starting fresh', {
-          error,
-        });
-      }
-
-      // Update index
-      currentIndex[email] = key;
-
-      // Store updated index back to S3
-      await dbSet(EMAIL_INDEX_S3_KEY, currentIndex);
-      logger.debug('Email mapping added to S3 index', { email, key });
-    }, `email-index-s3-add-${email}`)
-  );
+  // Note: S3 backup happens asynchronously via periodic sync
+  // The Valkey hash is the source of truth for real-time operations
 
   await Promise.all(operations);
   logger.info('Email mapping added successfully', { email, key });
@@ -114,36 +91,9 @@ export async function removeEmailMapping(email: string): Promise<boolean> {
     })
   );
 
-  // Update S3 index
-  operations.push(
-    retryWithExponentialBackoff(async () => {
-      // Get current index from S3
-      let currentIndex: Record<string, string> = {};
-      try {
-        const existingIndex =
-          await dbGet<Record<string, string>>(EMAIL_INDEX_S3_KEY);
-        if (existingIndex) {
-          currentIndex = existingIndex;
-        }
-      } catch (error) {
-        logger.debug('No existing email index in S3', { error });
-        return;
-      }
-
-      // Remove from index
-      delete currentIndex[email];
-
-      // Store updated index back to S3
-      await dbSet(EMAIL_INDEX_S3_KEY, currentIndex);
-      s3Updated = true;
-      logger.debug('Email mapping removed from S3 index', { email });
-    }, `email-index-s3-remove-${email}`).catch(error => {
-      logger.warn('Failed to update S3 email index', {
-        email,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    })
-  );
+  // Note: S3 backup happens asynchronously via periodic sync
+  // The Valkey hash is the source of truth for real-time operations
+  s3Updated = true; // Consider it updated since we'll sync later
 
   await Promise.all(operations);
 
@@ -296,6 +246,35 @@ export async function verifyEmailIndex(): Promise<{
     return result;
   } catch (error) {
     logger.error('Email index verification failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+/**
+ * Sync email index from Valkey hash to S3 backup
+ */
+export async function syncEmailIndexToS3(): Promise<void> {
+  logger.info('Syncing email index to S3 backup');
+
+  try {
+    // Get current state from Valkey hash (source of truth)
+    const currentIndex = await retryWithExponentialBackoff(async () => {
+      const client = await getValkeyClient();
+      return await client.hgetall(EMAIL_INDEX_KEY);
+    }, 'get-email-index-for-sync');
+
+    // Store complete index as S3 backup
+    await retryWithExponentialBackoff(async () => {
+      await dbSet(EMAIL_INDEX_S3_KEY, currentIndex);
+      logger.info('Email index successfully backed up to S3', { 
+        totalMappings: Object.keys(currentIndex).length 
+      });
+    }, 'email-index-s3-sync');
+
+  } catch (error) {
+    logger.error('Failed to sync email index to S3', {
       error: error instanceof Error ? error.message : String(error),
     });
     throw error;

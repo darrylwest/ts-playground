@@ -26,6 +26,7 @@
     "get-user-count": "npx dotenvx run -- node dist/cli/index.js get-user-count",
     "verify-email-index": "npx dotenvx run -- node dist/cli/index.js verify-email-index",
     "rebuild-email-index": "npx dotenvx run -- node dist/cli/index.js rebuild-email-index",
+    "sync-email-index": "npx dotenvx run -- node dist/cli/index.js sync-email-index",
     "health-check": "npx dotenvx run -- node dist/cli/index.js health-check"
   },
   "dependencies": {

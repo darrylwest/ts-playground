@@ -5,6 +5,7 @@ import {
   rebuildEmailIndex,
   getAllUserKeys,
   closeConnections,
+  syncEmailIndexToS3,
 } from '../../database/index.js';
 // CLI utilities and types imported via utils.js
 import {
@@ -70,6 +71,30 @@ export async function rebuildEmailIndexCommand(args: string[]): Promise<void> {
     return createSuccessResponse(
       { rebuilt: true, usersProcessed: userKeys.length },
       `Email index rebuilt successfully from ${userKeys.length} users`
+    );
+  });
+}
+
+/**
+ * Sync email index to S3 backup
+ * Usage: sync-email-index
+ */
+export async function syncEmailIndexCommand(args: string[]): Promise<void> {
+  await handleCommand('sync-email-index', async () => {
+    if (args.length !== 0) {
+      showUsage(
+        'sync-email-index',
+        'npm run sync-email-index',
+        ['npm run sync-email-index']
+      );
+      return createErrorResponse('No arguments expected');
+    }
+
+    await syncEmailIndexToS3();
+    
+    return createSuccessResponse(
+      { synced: true },
+      'Email index successfully synced to S3 backup'
     );
   });
 }

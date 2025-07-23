@@ -26,12 +26,9 @@ import {
 export async function createUserCommand(args: string[]): Promise<void> {
   await handleCommand('create-user', async () => {
     if (args.length !== 1) {
-      showUsage(
-        'create-user',
-        'npm run create-user <email>',
-        ['npm run create-user "henry.jones@test.com"']
-      );
-      return createErrorResponse('Email address is required');
+      const response = createErrorResponse('Email address is required');
+      response.message = 'Usage: npm run create-user <email>\n\nExamples:\nnpm run create-user "henry.jones@test.com"';
+      return response;
     }
 
     const email = args[0];

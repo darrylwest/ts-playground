@@ -16,6 +16,7 @@ import {
 import {
   verifyEmailIndexCommand,
   rebuildEmailIndexCommand,
+  syncEmailIndexCommand,
   healthCheckCommand,
   showStatsCommand,
   shutdownCommand,
@@ -34,6 +35,7 @@ const commands: Record<string, (args: string[]) => Promise<void>> = {
   // Admin commands
   'verify-email-index': verifyEmailIndexCommand,
   'rebuild-email-index': rebuildEmailIndexCommand,
+  'sync-email-index': syncEmailIndexCommand,
   'health-check': healthCheckCommand,
   'show-stats': showStatsCommand,
   'shutdown': shutdownCommand,
@@ -63,6 +65,7 @@ USER MANAGEMENT COMMANDS:
 ADMIN COMMANDS:
   verify-email-index                     Verify email index consistency
   rebuild-email-index                    Rebuild email index from scratch
+  sync-email-index                       Sync email index to S3 backup
   health-check                          Check database connectivity
   show-stats                            Show database statistics
   shutdown                              Close database connections

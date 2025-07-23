@@ -18,6 +18,7 @@ export {
   rebuildEmailIndex,
   verifyEmailIndex,
   getAllEmailMappings,
+  syncEmailIndexToS3,
 } from './email-index.js';
 
 // User operations

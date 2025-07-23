@@ -51,7 +51,7 @@ export const logger = winston.createLogger({
   transports: [fileTransport, errorFileTransport],
 });
 
-// Add console transport for development
+// Add console transport for development (not during tests)
 if (env.NODE_ENV === 'development') {
   logger.add(
     new winston.transports.Console({
