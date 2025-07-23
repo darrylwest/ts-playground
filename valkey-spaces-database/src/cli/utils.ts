@@ -12,11 +12,11 @@ export function createSuccessResponse<T>(
     success: true,
     data,
   };
-  
+
   if (message) {
     response.message = message;
   }
-  
+
   return response;
 }
 
@@ -42,7 +42,7 @@ export function outputResponse(response: CLIResponse): void {
  */
 export function parseKeyValueArgs(args: string[]): Record<string, string> {
   const parsed: Record<string, string> = {};
-  
+
   for (const arg of args) {
     const equalIndex = arg.indexOf('=');
     if (equalIndex > 0) {
@@ -51,7 +51,7 @@ export function parseKeyValueArgs(args: string[]): Record<string, string> {
       parsed[key] = value;
     }
   }
-  
+
   return parsed;
 }
 
@@ -91,13 +91,15 @@ export async function handleCommand(
   try {
     logger.debug(`Executing CLI command: ${commandName}`);
     const response = await handler();
-    
+
     if (response.success) {
       logger.debug(`CLI command completed successfully: ${commandName}`);
     } else {
-      logger.warn(`CLI command failed: ${commandName}`, { error: response.error });
+      logger.warn(`CLI command failed: ${commandName}`, {
+        error: response.error,
+      });
     }
-    
+
     outputResponse(response);
 
     // Close database connections after command completion
@@ -107,16 +109,16 @@ export async function handleCommand(
       logger.debug('Database connections closed after CLI command');
     } catch (closeError) {
       logger.warn('Error closing connections after CLI command', {
-        error: closeError instanceof Error ? closeError.message : String(closeError)
+        error:
+          closeError instanceof Error ? closeError.message : String(closeError),
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error(`CLI command error: ${commandName}`, { error: errorMessage });
-    
+
     outputResponse(createErrorResponse(errorMessage));
-    
+
     // Try to close connections even on error
     try {
       const { closeConnections } = await import('../database/index.js');
@@ -124,7 +126,7 @@ export async function handleCommand(
     } catch (closeError) {
       // Ignore close errors during error handling
     }
-    
+
     process.exit(1);
   }
 }
@@ -132,12 +134,16 @@ export async function handleCommand(
 /**
  * Show command usage
  */
-export function showUsage(_command: string, usage: string, examples?: string[]): void {
+export function showUsage(
+  _command: string,
+  usage: string,
+  examples?: string[]
+): void {
   const response = createErrorResponse(`Usage: ${usage}`);
-  
+
   if (examples && examples.length > 0) {
     response.message = `Examples:\n${examples.join('\n')}`;
   }
-  
+
   outputResponse(response);
 }

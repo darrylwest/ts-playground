@@ -268,11 +268,10 @@ export async function syncEmailIndexToS3(): Promise<void> {
     // Store complete index as S3 backup
     await retryWithExponentialBackoff(async () => {
       await dbSet(EMAIL_INDEX_S3_KEY, currentIndex);
-      logger.info('Email index successfully backed up to S3', { 
-        totalMappings: Object.keys(currentIndex).length 
+      logger.info('Email index successfully backed up to S3', {
+        totalMappings: Object.keys(currentIndex).length,
       });
     }, 'email-index-s3-sync');
-
   } catch (error) {
     logger.error('Failed to sync email index to S3', {
       error: error instanceof Error ? error.message : String(error),

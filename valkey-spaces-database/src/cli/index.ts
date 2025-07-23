@@ -31,14 +31,14 @@ const commands: Record<string, (args: string[]) => Promise<void>> = {
   'update-user': updateUserCommand,
   'list-users': listUsersCommand,
   'get-user-count': getUserCountCommand,
-  
+
   // Admin commands
   'verify-email-index': verifyEmailIndexCommand,
   'rebuild-email-index': rebuildEmailIndexCommand,
   'sync-email-index': syncEmailIndexCommand,
   'health-check': healthCheckCommand,
   'show-stats': showStatsCommand,
-  'shutdown': shutdownCommand,
+  shutdown: shutdownCommand,
 };
 
 /**
@@ -90,7 +90,7 @@ For more information, visit: https://github.com/your-repo/valkey-spaces-database
 async function main(): Promise<void> {
   try {
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
       showHelp();
       return;
@@ -101,18 +101,23 @@ async function main(): Promise<void> {
 
     if (!handler) {
       logger.error(`Unknown command: ${command}`);
-      outputResponse(createErrorResponse(`Unknown command: ${command}. Use --help to see available commands.`));
+      outputResponse(
+        createErrorResponse(
+          `Unknown command: ${command}. Use --help to see available commands.`
+        )
+      );
       process.exit(1);
     }
 
     // Execute the command
     await handler(commandArgs);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('CLI execution failed', { error: errorMessage });
-    
-    outputResponse(createErrorResponse(`CLI execution failed: ${errorMessage}`));
+
+    outputResponse(
+      createErrorResponse(`CLI execution failed: ${errorMessage}`)
+    );
     process.exit(1);
   }
 }
@@ -125,7 +130,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
   logger.error('Uncaught exception:', { error: error.message });
   outputResponse(createErrorResponse('Fatal error occurred'));
   process.exit(1);
@@ -134,39 +139,39 @@ process.on('uncaughtException', (error) => {
 // Graceful shutdown
 process.on('SIGINT', async () => {
   logger.info('Received SIGINT, shutting down gracefully...');
-  
+
   try {
     const { closeConnections } = await import('../database/index.js');
     await closeConnections();
   } catch (error) {
-    logger.error('Error during shutdown:', { 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error during shutdown:', {
+      error: error instanceof Error ? error.message : String(error),
     });
   }
-  
+
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM, shutting down gracefully...');
-  
+
   try {
     const { closeConnections } = await import('../database/index.js');
     await closeConnections();
   } catch (error) {
-    logger.error('Error during shutdown:', { 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error during shutdown:', {
+      error: error instanceof Error ? error.message : String(error),
     });
   }
-  
+
   process.exit(0);
 });
 
 // Run the CLI
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    logger.error('Main execution failed:', { 
-      error: error instanceof Error ? error.message : String(error) 
+  main().catch(error => {
+    logger.error('Main execution failed:', {
+      error: error instanceof Error ? error.message : String(error),
     });
     process.exit(1);
   });
