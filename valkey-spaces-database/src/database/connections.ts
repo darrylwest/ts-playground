@@ -146,7 +146,7 @@ export async function checkS3Health(): Promise<boolean> {
  * Gracefully close all database connections
  */
 export async function closeConnections(): Promise<void> {
-  logger.info('Closing database connections');
+  logger.debug('Closing database connections');
 
   const promises: Promise<void>[] = [];
 
@@ -155,6 +155,7 @@ export async function closeConnections(): Promise<void> {
       (async () => {
         try {
           await valkeyClient!.disconnect();
+          logger.debug('Valkey disconnect completed');
         } catch (error) {
           logger.error('Error closing Valkey connection', {
             error: error instanceof Error ? error.message : String(error),
@@ -172,5 +173,5 @@ export async function closeConnections(): Promise<void> {
   }
 
   await Promise.all(promises);
-  logger.info('Database connections closed');
+  logger.debug('Database connections closed');
 }

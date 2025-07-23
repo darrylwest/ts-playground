@@ -9,13 +9,12 @@ dist/
 build/
 *.tsbuildinfo
 
-# Environment files
-.env
-.env.local
-.env.development
-.env.test
-.env.production
+# Environment files - keys must stay private!
 .env.keys
+
+# Plain text env files (we use encrypted versions instead)
+.env.local
+.env.test
 
 # Logs
 logs/
@@ -51,9 +50,7 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-.env.test
+# dotenv environment variables file (removed - using encrypted versions)
 
 # IDE
 .vscode/
