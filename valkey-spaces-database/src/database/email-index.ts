@@ -1,5 +1,5 @@
 import { getValkeyClient } from './connections.js';
-import { set as dbSet, get as dbGet } from './operations.js';
+import { set as dbSet, get as dbGet, setS3Only } from './operations.js';
 import { retryWithExponentialBackoff } from './retry.js';
 import { logger } from '../config/logger.js';
 
@@ -265,9 +265,9 @@ export async function syncEmailIndexToS3(): Promise<void> {
       return await client.hgetall(EMAIL_INDEX_KEY);
     }, 'get-email-index-for-sync');
 
-    // Store complete index as S3 backup
+    // Store complete index as S3 backup (S3-only, not in cache)
     await retryWithExponentialBackoff(async () => {
-      await dbSet(EMAIL_INDEX_S3_KEY, currentIndex);
+      await setS3Only(EMAIL_INDEX_S3_KEY, currentIndex);
       logger.info('Email index successfully backed up to S3', {
         totalMappings: Object.keys(currentIndex).length,
       });

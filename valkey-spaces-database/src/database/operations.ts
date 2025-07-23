@@ -50,6 +50,28 @@ export async function set(key: string, data: object): Promise<void> {
 }
 
 /**
+ * S3-only set operation: Write directly to S3 without cache
+ */
+export async function setS3Only(key: string, data: object): Promise<void> {
+  const serializedData = JSON.stringify(data);
+
+  logger.debug('Starting S3-only write operation', { key });
+
+  await retryWithExponentialBackoff(async () => {
+    const client = getS3Client();
+    await client.send(
+      new PutObjectCommand({
+        Bucket: env.DO_SPACES_BUCKET,
+        Key: key,
+        Body: serializedData,
+        ContentType: 'application/json',
+      })
+    );
+    logger.debug('S3-only write successful', { key });
+  }, `s3-only-set-${key}`);
+}
+
+/**
  * Get operation: Cache-first with S3 fallback
  */
 export async function get<T = object>(key: string): Promise<T | null> {

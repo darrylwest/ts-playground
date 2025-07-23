@@ -8,7 +8,7 @@ export {
 } from './connections.js';
 
 // Core database operations
-export { set, get, del, exists } from './operations.js';
+export { set, get, del, exists, setS3Only } from './operations.js';
 
 // Email index operations
 export {
